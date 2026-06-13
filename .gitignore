@@ -1,0 +1,9 @@
+# Local reference material — copyrighted texts kept on disk but NEVER published
+Nathan Daniels RTOR_ Roguelike Theory of Relativity/
+Noor Shaker Julian Togelius Mark J Nelson Procedural Content Generation in Games Springer International Publishing/
+
+# OS / editor / build cruft
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

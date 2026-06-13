@@ -108,8 +108,21 @@ export class MessageBox {
   get empty() { return this.done && this.queue.length === 0; }
   render(ctx, x, y, w, h) {
     window9(ctx, x, y, w, h);
-    const words = this.shown.split('\n');
-    words.forEach((ln, i) => text(ctx, ln, x + 18, y + 16 + i * 22, { size: 16 }));
+    const pad = 18, lh = 22, size = 16, maxW = w - pad * 2;
+    ctx.font = size + 'px "Courier New", monospace';
+    // word-wrap each paragraph to fit the box width
+    const lines = [];
+    for (const para of this.shown.split('\n')) {
+      if (para === '') { lines.push(''); continue; }
+      let line = '';
+      for (const word of para.split(' ')) {
+        const test = line ? line + ' ' + word : word;
+        if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; }
+        else line = test;
+      }
+      lines.push(line);
+    }
+    lines.forEach((ln, i) => text(ctx, ln, x + pad, y + 14 + i * lh, { size }));
     if (this.done === false && !this.typing) {
       text(ctx, '▼', x + w - 26, y + h - 26, { color: COLORS.hi });
     }
