@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "emblem-roguelike",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["tools/serve_nocache.py"],
+      "port": 7431
+    }
+  ]
+}
