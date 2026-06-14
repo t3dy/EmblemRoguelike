@@ -870,7 +870,7 @@ class Game {
   }
   // ---- pause / system menu ----
   pauseOptions() {
-    return ['Resume', 'Music: Next Fugue', this.music.muted ? 'Music: Off ▶ turn On' : 'Music: On ▶ turn Off', 'Save & Quit to Title'];
+    return ['Resume', 'Quest Log', 'Music: Next Fugue', this.music.muted ? 'Music: Off ▶ turn On' : 'Music: On ▶ turn Off', 'Save & Quit to Title'];
   }
   openPause() {
     this.input = { up: false, down: false, left: false, right: false };
@@ -879,6 +879,12 @@ class Game {
   }
   closePause() { this.pause = null; }
   _pressPause(k) {
+    // Handle quest log navigation
+    if (this.pause.mode === 'questlog') {
+      if (k === 'menu' || k === 'cancel') this.pause = { sel: 1 };
+      return;
+    }
+
     const opts = this.pauseOptions();
     if (k === 'up') this.pause.sel = (this.pause.sel - 1 + opts.length) % opts.length;
     else if (k === 'down') this.pause.sel = (this.pause.sel + 1) % opts.length;
@@ -886,9 +892,10 @@ class Game {
     else if (k === 'confirm') {
       switch (this.pause.sel) {
         case 0: this.closePause(); break;
-        case 1: this.music.next(); break;
-        case 2: this.music.toggleMute(); break;
-        case 3: this.save(); this.closePause(); this.state = 'title'; this.titleSel = 0; break;
+        case 1: this.pause = { sel: 0, mode: 'questlog' }; break;
+        case 2: this.music.next(); break;
+        case 3: this.music.toggleMute(); break;
+        case 4: this.save(); this.closePause(); this.state = 'title'; this.titleSel = 0; break;
       }
     }
   }
@@ -1120,6 +1127,11 @@ class Game {
 
   _renderPause(ctx) {
     ctx.fillStyle = 'rgba(8,6,14,0.74)'; ctx.fillRect(0, 0, this.W, this.H);
+
+    if (this.pause.mode === 'questlog') {
+      return this._renderQuestLog(ctx);
+    }
+
     const opts = this.pauseOptions();
     const pw = 360, ph = opts.length * 34 + 92, px = this.W / 2 - pw / 2, py = this.H / 2 - ph / 2;
     window9(ctx, px, py, pw, ph);
@@ -1128,6 +1140,40 @@ class Game {
     text(ctx, np ? `Now playing: Fugue ${np}` : 'Music idle', this.W / 2, py + 44, { align: 'center', size: 12, color: COLORS.textDim });
     menu(ctx, opts, px + 44, py + 70, this.pause.sel, { lh: 34 });
     text(ctx, 'Z select • Esc/X resume', this.W / 2, py + ph - 18, { align: 'center', size: 12, color: COLORS.textDim });
+  }
+
+  _renderQuestLog(ctx) {
+    const pw = 500, ph = 380, px = this.W / 2 - pw / 2, py = this.H / 2 - ph / 2;
+    window9(ctx, px, py, pw, ph);
+    text(ctx, '▸ QUEST LOG ▸', px + 24, py + 16, { size: 16, color: COLORS.hi, shadow: false });
+
+    const h = this.hero;
+    let yy = py + 44;
+    const lh = 18, tw = pw - 48;
+
+    // Active quests
+    if (h.quests && h.quests.length > 0) {
+      text(ctx, 'ACTIVE CHARGES:', px + 24, yy, { size: 13, color: '#7a2010', shadow: false });
+      yy += lh;
+      for (const active of h.quests) {
+        const def = QUEST_BY_ID[active.id];
+        if (!def) continue;
+        const progress = def.objective.kind === 'reach' ? `${active.count}/${def.objective.deeper || 1}` : `${active.count}/${def.objective.target || 1}`;
+        text(ctx, `  ▸ ${def.title} [${progress}]`, px + 24, yy, { size: 12, color: '#5b4226', shadow: false });
+        yy += lh;
+      }
+    } else {
+      text(ctx, '(No active charges)', px + 24, yy, { size: 12, color: COLORS.textDim, shadow: false });
+      yy += lh;
+    }
+
+    yy += 8;
+
+    // Completed quests count
+    const completed = h.questsDone || 0;
+    text(ctx, `COMPLETED: ${completed} charges`, px + 24, yy, { size: 13, color: '#7a2010', shadow: false });
+
+    text(ctx, 'Esc back', this.W / 2, py + ph - 16, { align: 'center', size: 12, color: COLORS.textDim, shadow: false });
   }
 
   _objectiveText(o) {

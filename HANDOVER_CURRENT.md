@@ -2,12 +2,15 @@
 
 **Updated:** 2026-06-15 · **Branch:** main · Read `CLAUDE.md` first for run/architecture.
 
-**Session 2026-06-15 work:** 
-- Fixed 3 mislabeled monster sprites (m_wlion, m_lion, m_salamander) via EmblemPrintShop verification
-- Doubled furnace heating rate (0.5→1.0°C/tick) to trigger disasters in normal operations
-- Unified repair-cost logic (removed 2 duplicate implementations, now uses calculateRepairCost with court multipliers)
-- Redesigned character select: 1×9 cramped row → **3×3 grid layout** with 200px cards (3.5× larger) + proper 2D navigation
-- Scaled up world map landmarks: castle 0.95→1.8, town 0.8→1.4, etc. (50-140% increase) so emblem sprites display at 150px+ readable size
+**Session 2026-06-15 work (continued):** 
+- ✅ Committed core integration fixes (castle wiring, furnace heating boost, repair cost unification, landmark scaling)
+- 🎯 **Gameplay feedback enhancements**: Improved furnace operation messages (target temp, material count, completion status)
+- 🎯 **Danger system feedback**: Added visual alerts (⚠) and auditory cues; furnace panel now shows ⚠ PAUSED status
+- 🎯 **NPC system**: Added dialogue methods (getNPCDialogue, getNPCGreeting) for personality-driven interactions based on role/disposition
+- 🎯 **Critical bug fix**: NPC damage system now works — pass actual NPC objects (not IDs) to operations, enabling health damage during dangers
+- 🎯 **Furnace panel polish**: Displays operation name, status badge, operation's currentTemp/fuel (not furnace's), clearer state reflection
+- 🎯 **Location narratives**: Enhanced atmospheric flavor text for castle entrance (glyphs), Queen's court (moonlit garden)
+- 🎯 **Quest feedback**: Visual checkmarks (✓), clearer rewards, thematic messaging for Great Work progression
 
 ## Where things stand
 
@@ -27,37 +30,34 @@ parse-checks):
   `_showMaterialSelection` shows available materials and lets player pick quantities before starting
   operation. Materials are passed through to `startFurnaceOperation`, activating Tracks B+C1. ✅
 
-## What's NOT done (prioritized — start here)
+## What's DONE (this session)
 
 1. ~~**Material selection before an operation**~~ **DONE** (2026-06-14). ✅
+2. ~~**Furnace heating speed**~~ **DONE** (2026-06-15). 1.0°C/tick allows disasters to trigger. ✅
+3. ~~**Unify repair-cost logic**~~ **DONE** (2026-06-15). Uses calculateRepairCost with court multipliers. ✅
+4. ~~**Single furnace source of truth**~~ **DONE** (2026-06-15). Castle integration complete. ✅
+5. ~~**NPC damage system**~~ **DONE** (2026-06-15). **CRITICAL FIX**: NPCs now properly damaged during dangers. ✅
+6. ~~**World map graphics**~~ **DONE** (2026-06-15). Landmarks scaled to 150px+ readability. ✅
+7. ~~**Gameplay feedback**~~ **DONE** (2026-06-15). Better messages, visual indicators, furnace panel polish. ✅
+8. ~~**NPC dialogue system**~~ **DONE** (2026-06-15). Role-based dialogue, personality-driven greetings. ✅
 
-2. ~~**Furnace heating speed**~~ **DONE** (2026-06-15). Increased heating rate from 0.5°C/tick to 
-   1.0°C/tick (alchemical_integration.js:62), allowing disasters to trigger during normal 3-second
-   operations. Fuel consumption scaled correspondingly (0.01 → 0.02 per tick).
+## What's NOT done (prioritized — tackle in order)
 
-3. ~~**Unify repair-cost logic.**~~ **DONE** (2026-06-15). Removed two duplicate inline implementations
-   of repair cost formula at main.js:560 and main.js:645; now using single `calculateRepairCost`
-   function from court_economy.js which properly applies court multipliers.
+1. **Canvas testing of danger UI.** The choice dialog renders when danger fires, but hasn't been
+   visually verified in browser. Smoke test passes at class level.
 
-4. ~~**Single furnace source of truth.**~~ **DONE** (2026-06-15). Removed the mock furnace from
-   `startFurnaceOperation`. `newGame`/`continueGame` now create a `Castle('prague')` and set
-   `this.activeFurnace = this.castle.furnaces.main`. Room-specific furnaces are looked up by
-   `location` match; NPCs are pulled from `castle.NPCs` by room. All durability reads/writes go
-   through the same object reference.
+2. **Balancing pass.** Tune danger probability (trigger thresholds), material scarcity, reward scaling,
+   and operation difficulty curves. See `docs/archive/TRACK_C_INTEGRATION_PLAN.md` for test checklist.
 
-5. **Danger choice UI in the real loop.** `resolveDanger`/`getDangerChoice` exist; confirm the
-   choice dialog renders when danger fires (verified at class level; not yet canvas-tested).
+3. **Quest progression clarity.** Add a visible quest log/journal so player can track active charges,
+   progress, and completed quests. Currently quest state exists but isn't visible between encounters.
 
-6. **NPC presence during operations.** Now wired: `startFurnaceOperation` queries `castle.NPCs`
-   for NPCs whose `location` matches the roomId. Still need to verify damage/heal actually updates
-   NPC health during a danger consequence (Track C2).
+4. **More emblem quest variety.** The 50 emblems have stubs but many use generic "operational" type.
+   Add more diverse quest mechanics: diplomatic (NPC reconciliation), diplomatic (reputation),
+   discovery (find hidden locations), or blessing (gain permanent stat buffs).
 
-7. **Balancing pass.** Tune danger probability, rewards, repair costs, material scarcity.
-   See `docs/archive/TRACK_C_INTEGRATION_PLAN.md` for test checklist.
-
-8. ~~**World map graphics integration**~~ **DONE** (2026-06-15). Increased landmark sprite scales
-   (castle 0.95→1.8, town 0.8→1.4, etc.) to display emblem engravings at 150px+ readable size.
-   Sprites overflow isometric tiles naturally, maintaining visual hierarchy and navigability.
+5. **End-game polish.** Victory screen for dragon slain; game-over message after Dragon fight;
+   score/statistics display (quests done, deepest descent, final gold, etc.).
 
 ## How to verify your work
 
