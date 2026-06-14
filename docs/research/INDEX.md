@@ -21,6 +21,8 @@ as a pointer only (no copied passages; the texts are copyrighted scholarship).
 | [patrons.md](patrons.md) | Patrons & factions | Nummedal; *Magic Circle of Rudolf II*; Churton; Eamon |
 | [locations.md](locations.md) | Regions, towns, castles, dungeons | Rudolf's Prague; Khunrath's oratory-laboratory; mining/university towns; Obrist cosmos |
 | [events_status.md](events_status.md) | Room events, status effects, mechanics | Jung (stage symbolism); emblem trials; Splendor Solis |
+| [COVERAGE.md](COVERAGE.md) | **Exhaustive corpus pass** — every one of the 96 works marked gone-through | all six research agents |
+| [NEW_IDEAS.md](NEW_IDEAS.md) | Consolidated new ideas (10–20+ per asset type) with implementation tags | the exhaustive pass |
 
 ## Procgen / roguelike category map (from our design readings)
 

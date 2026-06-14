@@ -4,8 +4,8 @@ import { World, tileType } from './world.js';
 import { Battle } from './battle.js';
 import { Dungeon } from './dungeon.js';
 import { Town } from './town.js';
-import { Music } from './music.js?v=2';
-import { newHero, CLASSES, STAGES, stageForFloor, floorInfo, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats } from './data.js';
+import { Music } from './music.js?v=3';
+import { newHero, CLASSES, STAGES, stageForFloor, floorInfo, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats, ATTRIBS, ATTRIB_POINTS, ATTRIB_GAIN } from './data.js';
 import { MessageBox, window9, parchmentCard, text, menu, COLORS } from './ui.js';
 
 const QUEST_BY_ID = Object.fromEntries(QUESTS.map(q => [q.id, q]));
@@ -28,6 +28,10 @@ class Game {
     this._dungeonEnemy = null;   // enemy ref when a battle was started from the dungeon
     this.titleSel = 0;
     this.classSel = 0;
+    this.charPhase = 'class';     // 'class' | 'attrib'
+    this.attribs = { might: 0, ward: 0, vigor: 0, spirit: 0 };
+    this.attribSel = 0;
+    this.pause = null;            // { sel } when the pause menu overlay is open
     this.titleT = 0;
     this.deathDepth = 0;
     this.questOffer = null;      // { who, quest } when a King/Queen is consulted
@@ -70,10 +74,19 @@ class Game {
   sfx(name) { this.audio.play(name); }
 
   // ---- flow ----
-  goCharSelect() { this.classSel = 0; this.state = 'charselect'; this.audio.unlock(); }
+  goCharSelect() {
+    this.classSel = 0;
+    this.charPhase = 'class';
+    this.attribs = { might: 0, ward: 0, vigor: 0, spirit: 0 };
+    this.attribSel = 0;
+    this.state = 'charselect';
+    this.audio.unlock();
+  }
+  attribSpent() { return this.attribs.might + this.attribs.ward + this.attribs.vigor + this.attribs.spirit; }
+  attribLeft() { return ATTRIB_POINTS - this.attribSpent(); }
 
-  newGame(classId) {
-    this.hero = newHero(classId);
+  newGame(classId, attribs) {
+    this.hero = newHero(classId, attribs);
     this.world = new World(this);
     this.state = 'overworld';
     this.msg.queue = []; this.msg.done = true;
@@ -309,9 +322,11 @@ class Game {
     const up = (e) => this._key(e.key, false);
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
-    // on-screen dpad / buttons
-    document.querySelectorAll('[data-key]').forEach(el => {
-      const send = (v) => (ev) => { ev.preventDefault(); this._key(el.dataset.key, v); };
+    // on-screen dpad / buttons. data-key = one key; data-keys = several at once
+    // (used by the diagonal buttons, which must hold two directions together).
+    document.querySelectorAll('[data-key],[data-keys]').forEach(el => {
+      const keys = el.dataset.keys ? el.dataset.keys.split(',') : [el.dataset.key];
+      const send = (v) => (ev) => { ev.preventDefault(); keys.forEach(kk => this._key(kk, v)); };
       el.addEventListener('touchstart', send(true), {passive:false});
       el.addEventListener('touchend', send(false), {passive:false});
       el.addEventListener('mousedown', send(true));
@@ -326,8 +341,10 @@ class Game {
       case 'ArrowLeft': case 'a': case 'A': return 'left';
       case 'ArrowRight': case 'd': case 'D': return 'right';
       case ' ': case 'Enter': case 'z': case 'Z': return 'confirm';
-      case 'Escape': case 'x': case 'X': case 'Backspace': return 'cancel';
+      case 'x': case 'X': case 'Backspace': return 'cancel';
+      case 'Escape': case 'p': case 'P': case 'Tab': return 'menu';
       case 'm': case 'M': return 'mute';
+      case 'n': case 'N': return 'musicnext';
     }
     return null;
   }
@@ -337,12 +354,44 @@ class Game {
     this.audio.unlock();
     this.music.start();
     if (k === 'mute') { if (isDown) this.music.toggleMute(); return; }
+    if (k === 'musicnext') { if (isDown) this.music.next(); return; }
     // continuous movement flags for overworld
     if (['up','down','left','right'].includes(k)) this.input[k] = isDown;
     if (!isDown) return;            // discrete actions on press only
     this._press(k);
   }
+  // ---- pause / system menu ----
+  pauseOptions() {
+    return ['Resume', 'Music: Next Fugue', this.music.muted ? 'Music: Off ▶ turn On' : 'Music: On ▶ turn Off', 'Save & Quit to Title'];
+  }
+  openPause() {
+    this.input = { up: false, down: false, left: false, right: false };
+    this.pause = { sel: 0 };
+    this.audio.play('magic');
+  }
+  closePause() { this.pause = null; }
+  _pressPause(k) {
+    const opts = this.pauseOptions();
+    if (k === 'up') this.pause.sel = (this.pause.sel - 1 + opts.length) % opts.length;
+    else if (k === 'down') this.pause.sel = (this.pause.sel + 1) % opts.length;
+    else if (k === 'menu' || k === 'cancel') this.closePause();
+    else if (k === 'confirm') {
+      switch (this.pause.sel) {
+        case 0: this.closePause(); break;
+        case 1: this.music.next(); break;
+        case 2: this.music.toggleMute(); break;
+        case 3: this.save(); this.closePause(); this.state = 'title'; this.titleSel = 0; break;
+      }
+    }
+  }
+
   _press(k) {
+    // the pause overlay intercepts all input while open
+    if (this.pause) { this._pressPause(k); return; }
+    // open the pause menu from any in-play state
+    if (k === 'menu' && ['overworld', 'dungeon', 'town', 'dialog', 'quest'].includes(this.state)) {
+      this.openPause(); return;
+    }
     if (this.state === 'title') {
       const opts = this.titleOptions();
       if (k === 'up') this.titleSel = (this.titleSel - 1 + opts.length) % opts.length;
@@ -355,12 +404,22 @@ class Game {
       return;
     }
     if (this.state === 'charselect') {
-      if (k === 'left')  this.classSel = (this.classSel - 1 + CLASSES.length) % CLASSES.length;
-      if (k === 'right') this.classSel = (this.classSel + 1) % CLASSES.length;
-      if (k === 'up')    this.classSel = (this.classSel - 1 + CLASSES.length) % CLASSES.length;
-      if (k === 'down')  this.classSel = (this.classSel + 1) % CLASSES.length;
-      if (k === 'confirm') this.newGame(CLASSES[this.classSel].id);
-      if (k === 'cancel') { this.state = 'title'; this.titleSel = 0; }
+      if (this.charPhase === 'class') {
+        if (k === 'left')  this.classSel = (this.classSel - 1 + CLASSES.length) % CLASSES.length;
+        if (k === 'right') this.classSel = (this.classSel + 1) % CLASSES.length;
+        if (k === 'up')    this.classSel = (this.classSel - 1 + CLASSES.length) % CLASSES.length;
+        if (k === 'down')  this.classSel = (this.classSel + 1) % CLASSES.length;
+        if (k === 'confirm') { this.charPhase = 'attrib'; this.attribSel = 0; }
+        if (k === 'cancel') { this.state = 'title'; this.titleSel = 0; }
+      } else { // attribute point-buy
+        if (k === 'up')   this.attribSel = (this.attribSel - 1 + ATTRIBS.length) % ATTRIBS.length;
+        if (k === 'down') this.attribSel = (this.attribSel + 1) % ATTRIBS.length;
+        const key = ATTRIBS[this.attribSel].key;
+        if (k === 'right' && this.attribLeft() > 0) this.attribs[key]++;
+        if (k === 'left' && this.attribs[key] > 0) this.attribs[key]--;
+        if (k === 'confirm') this.newGame(CLASSES[this.classSel].id, { ...this.attribs });
+        if (k === 'cancel') { this.charPhase = 'class'; }
+      }
       return;
     }
     if (this.state === 'dialog') {
@@ -440,6 +499,19 @@ class Game {
     } else if (this.state === 'battle' && this.battle) {
       this.battle.render(ctx);
     }
+    if (this.pause) this._renderPause(ctx);
+  }
+
+  _renderPause(ctx) {
+    ctx.fillStyle = 'rgba(8,6,14,0.74)'; ctx.fillRect(0, 0, this.W, this.H);
+    const opts = this.pauseOptions();
+    const pw = 360, ph = opts.length * 34 + 92, px = this.W / 2 - pw / 2, py = this.H / 2 - ph / 2;
+    window9(ctx, px, py, pw, ph);
+    text(ctx, '❖ PAUSED ❖', this.W / 2, py + 16, { align: 'center', size: 20, color: COLORS.hi });
+    const np = this.music.nowPlaying();
+    text(ctx, np ? `Now playing: Fugue ${np}` : 'Music idle', this.W / 2, py + 44, { align: 'center', size: 12, color: COLORS.textDim });
+    menu(ctx, opts, px + 44, py + 70, this.pause.sel, { lh: 34 });
+    text(ctx, 'Z select • Esc/X resume', this.W / 2, py + ph - 18, { align: 'center', size: 12, color: COLORS.textDim });
   }
 
   _objectiveText(o) {
@@ -548,6 +620,7 @@ class Game {
     const g = ctx.createLinearGradient(0, 0, 0, this.H);
     g.addColorStop(0, '#13101e'); g.addColorStop(1, '#241830');
     ctx.fillStyle = g; ctx.fillRect(0, 0, this.W, this.H);
+    if (this.charPhase === 'attrib') { this._renderAttribs(ctx); return; }
     text(ctx, 'CHOOSE THY VESSEL', this.W/2, 30, { align: 'center', size: 26, color: COLORS.hi });
 
     const n = CLASSES.length, cw = this.W / n;
@@ -579,6 +652,47 @@ class Game {
 
     if (Math.floor(this.titleT * 1.5) % 2 === 0)
       text(ctx, '← → choose   •   Z confirm   •   X back', this.W/2, this.H - 26, { align: 'center', size: 13, color: COLORS.textDim });
+  }
+
+  _renderAttribs(ctx) {
+    const c = CLASSES[this.classSel];
+    text(ctx, 'TEMPER THY SPIRIT', this.W / 2, 30, { align: 'center', size: 26, color: COLORS.hi });
+    text(ctx, `${c.name} — distribute ${ATTRIB_POINTS} points among the three principles`,
+      this.W / 2, 66, { align: 'center', size: 14, color: COLORS.text });
+
+    // class portrait on the left
+    const img = Assets.img(c.sprite);
+    if (img) {
+      const sc = Math.min(220 / img.width, 300 / img.height), dw = img.width * sc, dh = img.height * sc;
+      ctx.drawImage(img, this.W / 2 - 320 - dw / 2 + 60, 110, dw, dh);
+    }
+
+    // points-remaining banner
+    const left = this.attribLeft();
+    text(ctx, `Points remaining: ${left}`, this.W / 2 + 40, 96,
+      { align: 'center', size: 16, color: left > 0 ? COLORS.hi : COLORS.textDim });
+
+    // attribute rows
+    const bx = this.W / 2 - 60, by = 130, rowH = 64;
+    ATTRIBS.forEach((a, i) => {
+      const yy = by + i * rowH, sel = i === this.attribSel;
+      const val = this.attribs[a.key];
+      window9(ctx, bx - 20, yy - 8, 420, rowH - 10);
+      if (sel) { ctx.lineWidth = 3; ctx.strokeStyle = COLORS.hi; ctx.strokeRect(bx - 22, yy - 10, 424, rowH - 6); }
+      text(ctx, a.name, bx, yy + 2, { size: 17, color: sel ? COLORS.hi : COLORS.text });
+      // pip bar
+      for (let p = 0; p < ATTRIB_POINTS; p++) {
+        ctx.fillStyle = p < val ? COLORS.hpGreen : 'rgba(255,255,255,0.14)';
+        ctx.fillRect(bx + 150 + p * 22, yy - 4, 16, 16);
+      }
+      text(ctx, sel ? '◀ ' + val + ' ▶' : String(val), bx + 150 + ATTRIB_POINTS * 22 + 14, yy + 2,
+        { size: 15, color: sel ? COLORS.hi : COLORS.textDim });
+      text(ctx, a.desc, bx, yy + 24, { size: 12, color: COLORS.textDim });
+    });
+
+    if (Math.floor(this.titleT * 1.5) % 2 === 0)
+      text(ctx, '↑↓ pick principle  •  ← → spend/refund  •  Z begin  •  X back',
+        this.W / 2, this.H - 26, { align: 'center', size: 13, color: COLORS.textDim });
   }
 
   _wrap(ctx, str, x, y, maxW, lh) {

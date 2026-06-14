@@ -71,12 +71,22 @@ export class World {
 
   update(dt, input) {
     this.bob += dt * 6;
-    // input -> movement (screen-aligned diagonal grid steps), only when idle
+    // input -> movement, only when idle. 8-WAY: the four screen-cardinal moves
+    // all preserve gx+gy parity (so half the map — including odd-parity towns —
+    // was unreachable). Diagonal key combos add the four PARITY-CHANGING grid
+    // moves, so every tile is reachable.
     if (!this.move && this.game.msg.empty) {
-      if (input.up)    this.tryMove(-1, -1, 'up');
-      else if (input.down)  this.tryMove(1, 1, 'down');
-      else if (input.left)  this.tryMove(-1, 1, 'left');
-      else if (input.right) this.tryMove(1, -1, 'right');
+      const u = input.up, d = input.down, l = input.left, r = input.right;
+      // combos first (screen-diagonals = grid-cardinals, which flip parity)
+      if (u && r)      this.tryMove(0, -1, 'up');     // NE on screen  (gy-1)
+      else if (u && l) this.tryMove(-1, 0, 'up');     // NW on screen  (gx-1)
+      else if (d && r) this.tryMove(1, 0, 'down');    // SE on screen  (gx+1)
+      else if (d && l) this.tryMove(0, 1, 'down');    // SW on screen  (gy+1)
+      // screen-cardinals (preserve parity)
+      else if (u)      this.tryMove(-1, -1, 'up');
+      else if (d)      this.tryMove(1, 1, 'down');
+      else if (l)      this.tryMove(-1, 1, 'left');
+      else if (r)      this.tryMove(1, -1, 'right');
     }
 
     if (this.move) {

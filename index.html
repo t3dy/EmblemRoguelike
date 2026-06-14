@@ -12,19 +12,26 @@
       <canvas id="game" width="768" height="576"></canvas>
     </div>
     <div id="touch">
-      <div class="dpad">
-        <button data-key="ArrowUp"    class="db up">▲</button>
-        <button data-key="ArrowLeft"  class="db left">◀</button>
-        <button data-key="ArrowRight" class="db right">▶</button>
-        <button data-key="ArrowDown"  class="db down">▼</button>
+      <div class="dpad8">
+        <button data-keys="ArrowUp,ArrowLeft"    class="db nw" title="up-left">↖</button>
+        <button data-key="ArrowUp"               class="db up">▲</button>
+        <button data-keys="ArrowUp,ArrowRight"   class="db ne" title="up-right">↗</button>
+        <button data-key="ArrowLeft"             class="db left">◀</button>
+        <span class="db mid"></span>
+        <button data-key="ArrowRight"            class="db right">▶</button>
+        <button data-keys="ArrowDown,ArrowLeft"  class="db sw" title="down-left">↙</button>
+        <button data-key="ArrowDown"             class="db down">▼</button>
+        <button data-keys="ArrowDown,ArrowRight" class="db se" title="down-right">↘</button>
       </div>
       <div class="acts">
-        <button data-key="x" class="ab">B</button>
-        <button data-key="z" class="ab">A</button>
+        <button data-key="x" class="ab" title="cancel/back">B</button>
+        <button data-key="z" class="ab" title="confirm">A</button>
+        <button data-key="p" class="sb" title="menu">☰</button>
+        <button data-key="n" class="sb" title="next fugue">&#9835;</button>
       </div>
     </div>
-    <p id="hint">Arrows / WASD to move &nbsp;•&nbsp; Z or Space = confirm &nbsp;•&nbsp; X = cancel/save &nbsp;•&nbsp; M = music on/off</p>
+    <p id="hint">Move: Arrows / WASD (hold two for diagonals) &nbsp;•&nbsp; Z confirm &nbsp;•&nbsp; X back &nbsp;•&nbsp; Esc/P menu (Save&nbsp;&amp;&nbsp;Quit) &nbsp;•&nbsp; M mute &nbsp;•&nbsp; N next fugue</p>
   </div>
-  <script type="module" src="js/main.js?v=2"></script>
+  <script type="module" src="js/main.js?v=3"></script>
 </body>
 </html>

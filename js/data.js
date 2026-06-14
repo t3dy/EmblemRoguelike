@@ -170,11 +170,23 @@ export function recomputeStats(hero) {
   if (cls.passiveKey === 'stout') maxHp = Math.round(maxHp * 1.1);
   let maxMp = Math.max(0, s.maxMp + (cls.mods.maxMp || 0));
   if (cls.passiveKey === 'opus') maxMp += (hero.level - 1) * 2;
-  hero.maxHp = maxHp;
-  hero.maxMp = maxMp;
-  hero.atk = s.atk + (cls.mods.atk || 0) + (WEAPONS[hero.weapon] ? WEAPONS[hero.weapon].atk : 0);
-  hero.def = s.def + (cls.mods.def || 0) + (ARMOR[hero.armor] ? ARMOR[hero.armor].def : 0);
+  // attribute point-buy from character creation (folds in at every recompute)
+  const a = hero.attribs || {};
+  hero.maxHp = maxHp + (a.vigor || 0) * ATTRIB_GAIN.vigor;
+  hero.maxMp = maxMp + (a.spirit || 0) * ATTRIB_GAIN.spirit;
+  hero.atk = s.atk + (cls.mods.atk || 0) + (WEAPONS[hero.weapon] ? WEAPONS[hero.weapon].atk : 0) + (a.might || 0) * ATTRIB_GAIN.might;
+  hero.def = s.def + (cls.mods.def || 0) + (ARMOR[hero.armor] ? ARMOR[hero.armor].def : 0) + (a.ward || 0) * ATTRIB_GAIN.ward;
 }
+
+// character-creation attributes: points → stat gains
+export const ATTRIB_POINTS = 6;
+export const ATTRIB_GAIN = { might: 1, ward: 1, vigor: 3, spirit: 3 };
+export const ATTRIBS = [
+  { key: 'might',  name: 'Might',  desc: 'Sulphur — the burning force. +1 Attack per point.' },
+  { key: 'ward',   name: 'Ward',   desc: 'Salt — the fixed body. +1 Defence per point.' },
+  { key: 'vigor',  name: 'Vigor',  desc: 'Vital spirit. +3 max HP per point.' },
+  { key: 'spirit', name: 'Spirit', desc: 'Mercury — the volatile. +3 max MP per point.' },
+];
 
 // ---- Playable characters (the human figures from the emblems) ---------------
 // Each class re-skins the hero sprite and tweaks stats / kit / a passive.
@@ -408,12 +420,13 @@ const START_GEAR = {
 };
 
 // starting hero for a chosen class
-export function newHero(classId = 'knight') {
+export function newHero(classId = 'knight', attribs = null) {
   const cls = CLASS_BY_ID[classId] || CLASSES[0];
   const gear = START_GEAR[cls.id] || { weapon: 'dagger', armor: 'leather' };
   const hero = {
     name: cls.name.replace(/^The /, ''),
     classId: cls.id, sprite: cls.sprite, passiveKey: cls.passiveKey,
+    attribs: attribs || { might: 0, ward: 0, vigor: 0, spirit: 0 },
     level: 1, xp: 0,
     hp: 1, maxHp: 1, mp: 0, maxMp: 0, atk: 1, def: 1,
     weapon: gear.weapon, armor: gear.armor,

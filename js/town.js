@@ -9,6 +9,8 @@ const ROOT_MENU = [
   { id: 'inn',       label: 'Rest at the Inn (restore HP & MP)' },
   { id: 'apothecary',label: 'Apothecary (alchemical medicines)' },
   { id: 'armoury',   label: 'Armoury (weapons & armour)' },
+  { id: 'bookstore', label: 'Bookstore (tomes of the Art)' },
+  { id: 'assayer',   label: "Assayer (sell relics for gold)" },
   { id: 'leave',     label: 'Leave town' },
 ];
 
@@ -18,6 +20,19 @@ const ARMOURY = {
   weapons: ['dagger', 'sword', 'geber', 'falchion', 'scythe', 'michael', 'sol', 'flameblade'],
   armour: ['leather', 'whiterobe', 'mail', 'salahide', 'peacockmantle', 'plate', 'purple'],
 };
+
+// the Bookstore — printed tomes of the Art. Each is bought ONCE and confers a
+// permanent boon (folded into hero.attribs so it survives level-ups), or teaches
+// a spell. Sourced from the research corpus (Valentine, Trismosin, Rupescissa,
+// Maier's Atalanta Fugiens, the Mutus Liber, Aurora consurgens).
+const BOOKS = [
+  { key: 'keys',     name: 'The Twelve Keys (Basil Valentine)', cost: 70, attrib: 'might',  blurb: 'Antimony and the work of fire. +1 Might (Attack).' },
+  { key: 'splendor', name: 'Splendor Solis (Trismosin)',        cost: 70, attrib: 'ward',   blurb: 'The seven parables of the fixed body. +1 Ward (Defence).' },
+  { key: 'quinta',   name: 'De Consideratione Quintae Essentiae', cost: 80, attrib: 'vigor', blurb: 'Rupescissa on the incorruptible fifth essence. +1 Vigor (+3 HP).' },
+  { key: 'mutus',    name: 'Mutus Liber (the Mute Book)',       cost: 80, attrib: 'spirit', blurb: 'The wordless emblems of the dew-work. +1 Spirit (+3 MP).' },
+  { key: 'aurora',   name: 'Aurora Consurgens',                 cost: 110, spell: 'HEAL',    blurb: 'The rising dawn. Teaches the Heal incantation.' },
+  { key: 'atalanta', name: 'Atalanta Fugiens (Maier)',          cost: 40, gift: ['apple', 2], blurb: 'The fleeing huntress, in fugue and emblem. Gift: 2 Golden Apples.' },
+];
 
 export class Town {
   constructor(game, name) {
@@ -68,6 +83,16 @@ export class Town {
         ...ARMOURY.weapons.map(k => ({ kind: 'weapon', key: k, name: WEAPONS[k].name, cost: WEAPONS[k].cost, desc: WEAPONS[k].desc })),
         ...ARMOURY.armour.map(k => ({ kind: 'armor', key: k, name: ARMOR[k].name, cost: ARMOR[k].cost, desc: ARMOR[k].desc })),
       ];
+    } else if (id === 'bookstore') {
+      this.shopKind = 'bookstore'; this.mode = 'shop'; this.sel = 0;
+      this.list = BOOKS.map(b => ({ kind: 'book', key: b.key, name: b.name, cost: b.cost, desc: b.blurb, book: b }));
+    } else if (id === 'assayer') {
+      this.shopKind = 'assayer'; this.mode = 'shop'; this.sel = 0;
+      // sell consumables the hero holds for half their apothecary value
+      this.list = APOTHECARY
+        .filter(k => (h.items[k] || 0) > 0)
+        .map(k => ({ kind: 'sell', key: k, name: ITEMS[k].name, cost: Math.max(4, Math.floor(this._itemCost(k) / 2)), desc: `You hold ${h.items[k]}. Sell one for gold.` }));
+      if (!this.list.length) { this.mode = 'menu'; this.game.msg.push('The assayer eyes thy empty satchel. "Bring me relics or medicines to weigh."'); }
     }
   }
 
@@ -76,7 +101,41 @@ export class Town {
   _buy(entry) {
     const h = this.game.hero;
     if (!entry) return;
+    // the assayer BUYS from the hero — handle before the gold check
+    if (entry.kind === 'sell') {
+      if ((h.items[entry.key] || 0) <= 0) { this.game.msg.push('Thou hast none to sell.'); return; }
+      h.items[entry.key]--; h.gold += entry.cost;
+      this.game.sfx('heal');
+      this.game.msg.push(`Sold ${entry.name} for ${entry.cost} gold.`);
+      // refresh the list (item may now be depleted)
+      this._choose('assayer');
+      this.game.save();
+      return;
+    }
     if (entry.cost > h.gold) { this.game.sfx('hit'); this.game.msg.push('Not enough gold.'); return; }
+    if (entry.kind === 'book') {
+      h.flags.books = h.flags.books || {};
+      if (h.flags.books[entry.key]) { this.game.msg.push('Thou hast already studied that tome.'); return; }
+      const b = entry.book;
+      h.gold -= entry.cost; h.flags.books[entry.key] = true;
+      let gained = '';
+      if (b.attrib) {
+        h.attribs = h.attribs || { might: 0, ward: 0, vigor: 0, spirit: 0 };
+        h.attribs[b.attrib] = (h.attribs[b.attrib] || 0) + 1;
+        recomputeStats(h);
+        gained = `Attack ${h.atk}, Defence ${h.def}, HP ${h.maxHp}, MP ${h.maxMp}.`;
+      } else if (b.spell) {
+        if (!h.spells.includes(b.spell)) h.spells.push(b.spell);
+        gained = `Learned ${b.spell}.`;
+      } else if (b.gift) {
+        const [k, n] = b.gift; h.items[k] = (h.items[k] || 0) + n;
+        gained = `Received ${n}× ${ITEMS[k].name}.`;
+      }
+      this.game.sfx('level');
+      this.game.msg.push(`You study ${b.name}.`, gained);
+      this.game.save();
+      return;
+    }
     if (entry.kind === 'item') {
       h.gold -= entry.cost;
       h.items[entry.key] = (h.items[entry.key] || 0) + 1;
@@ -107,10 +166,12 @@ export class Town {
     ctx.fillStyle = '#5a4632'; ctx.fillRect(0, H - 150, W, 150);
 
     // building sprites along the street
-    this._building(ctx, 's_church', W * 0.18, H - 150, 1.1, 'Church');
-    this._building(ctx, 's_house', W * 0.40, H - 150, 1.0, 'Inn');
-    this._building(ctx, 's_furnace', W * 0.60, H - 150, 1.0, 'Apothecary');
-    this._building(ctx, 's_town', W * 0.82, H - 150, 0.8, 'Armoury');
+    this._building(ctx, 's_church', W * 0.10, H - 150, 1.0, 'Church');
+    this._building(ctx, 's_house', W * 0.26, H - 150, 0.9, 'Inn');
+    this._building(ctx, 's_furnace', W * 0.42, H - 150, 0.9, 'Apothecary');
+    this._building(ctx, 's_town', W * 0.58, H - 150, 0.7, 'Armoury');
+    this._building(ctx, 's_house', W * 0.74, H - 150, 0.8, 'Bookstore');
+    this._building(ctx, 's_furnace', W * 0.90, H - 150, 0.7, 'Assayer');
 
     // title
     text(ctx, this.name, W / 2, 18, { align: 'center', size: 22, color: COLORS.hi });
@@ -131,20 +192,25 @@ export class Town {
       text(ctx, 'Z select   •   X leave', W / 2, by + 168, { align: 'center', size: 12, color: COLORS.textDim });
     } else {
       // shop list
-      const bw = 460, bx = W / 2 - bw / 2, by = H - 250;
-      window9(ctx, bx, by, bw, 230);
-      text(ctx, this.shopKind === 'apothecary' ? 'APOTHECARY' : 'ARMOURY', bx + 20, by + 12, { size: 15, color: COLORS.hi });
+      const TITLES = { apothecary: 'APOTHECARY', armoury: 'ARMOURY', bookstore: 'BOOKSTORE', assayer: 'ASSAYER' };
+      const selling = this.shopKind === 'assayer';
+      const bw = 500, bx = W / 2 - bw / 2, by = H - 260;
+      window9(ctx, bx, by, bw, 240);
+      text(ctx, TITLES[this.shopKind] || 'SHOP', bx + 20, by + 12, { size: 15, color: COLORS.hi });
       text(ctx, `Gold ${h.gold}`, bx + bw - 110, by + 12, { size: 14, color: COLORS.hi });
       this.list.forEach((e, i) => {
         const yy = by + 40 + i * 22, sel = i === this.sel;
         const owned = (e.kind === 'weapon' && h.weapon === e.key) || (e.kind === 'armor' && h.armor === e.key);
-        const col = sel ? COLORS.hi : (e.cost > h.gold ? '#9a6a6a' : COLORS.text);
+        const studied = e.kind === 'book' && h.flags.books && h.flags.books[e.key];
+        const tooDear = !selling && e.cost > h.gold;
+        const col = sel ? COLORS.hi : (studied ? '#8a8a6a' : (tooDear ? '#9a6a6a' : COLORS.text));
         if (sel) text(ctx, '▶', bx + 16, yy, { color: COLORS.hi });
-        text(ctx, e.name + (owned ? ' (equipped)' : ''), bx + 36, yy, { size: 14, color: col });
-        text(ctx, e.cost + 'g', bx + bw - 150, yy, { size: 14, color: col });
-        if (sel) text(ctx, e.desc, bx + 36, by + 200, { size: 12, color: COLORS.textDim });
+        const tag = owned ? ' (equipped)' : (studied ? ' (studied)' : '');
+        text(ctx, e.name + tag, bx + 36, yy, { size: 14, color: col });
+        text(ctx, (selling ? '+' : '') + e.cost + 'g', bx + bw - 150, yy, { size: 14, color: col });
       });
-      text(ctx, 'Z buy   •   X back', bx + bw - 150, by + 200, { size: 12, color: COLORS.textDim });
+      if (this.list[this.sel]) text(ctx, this.list[this.sel].desc, bx + 36, by + 210, { size: 12, color: COLORS.textDim });
+      text(ctx, selling ? 'Z sell   •   X back' : 'Z buy   •   X back', bx + bw - 150, by + 210, { size: 12, color: COLORS.textDim });
     }
   }
 

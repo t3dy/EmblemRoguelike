@@ -56,6 +56,16 @@ export class Music {
     return this.muted;
   }
 
+  // skip to the next fugue in the current area's playlist
+  next() {
+    if (!this.playlist.length) return null;
+    if (this.muted) { this.muted = false; if (this.master) this.master.gain.value = 0.9; }
+    this._advance();
+    return this.nowPlaying();
+  }
+  // emblem number of the currently selected fugue (for UI)
+  nowPlaying() { return this.playlist.length ? this.playlist[this.pIdx] : null; }
+
   setArea(key) {
     if (key === this.area) return;
     this.area = key;
