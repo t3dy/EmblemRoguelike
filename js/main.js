@@ -1073,12 +1073,9 @@ class Game {
     if (this.state === 'title') return this._renderTitle(ctx);
     if (this.state === 'charselect') return this._renderCharSelect(ctx);
     if (this.state === 'gameover') {
-      return this._renderEnd(ctx, 'NIGREDO', '#1a0808',
-        `${this.hero ? this.hero.name : 'The adept'} dissolves into the blackness.\n` +
-        `Reached floor ${this.deathDepth}.   Deepest descent: ${this.bestDepth()}.`);
+      return this._renderGameOver(ctx);
     }
-    if (this.state === 'victory') return this._renderEnd(ctx, 'RUBEDO — THE STONE', '#2a0d0d',
-      'The Dragon is undone and the Lapis is achieved.\nThe Great Work is complete.');
+    if (this.state === 'victory') return this._renderVictory(ctx);
 
     if (this.state === 'overworld' || this.state === 'dialog') {
       this.world.render(ctx);
@@ -1388,6 +1385,47 @@ class Game {
       else line = t;
     }
     if (line) text(ctx, line, x, yy, { size: 15 });
+  }
+
+  _renderGameOver(ctx) {
+    ctx.fillStyle = '#1a0808'; ctx.fillRect(0, 0, this.W, this.H);
+    text(ctx, 'NIGREDO', this.W / 2, this.H / 2 - 80, { align: 'center', size: 46, color: COLORS.hi });
+    text(ctx, `${this.hero ? this.hero.name : 'The adept'} dissolves into the blackness.`, this.W / 2, this.H / 2, { align: 'center', size: 17, color: COLORS.text });
+
+    let yy = this.H / 2 + 50;
+    const stats = [
+      `Floor reached: ${this.deathDepth}`,
+      `Quests completed: ${this.hero?.questsDone || 0}`,
+      `Gold accumulated: ${this.hero?.gold || 0}`,
+    ];
+    stats.forEach(stat => {
+      text(ctx, stat, this.W / 2, yy, { align: 'center', size: 13, color: COLORS.textDim });
+      yy += 20;
+    });
+
+    if (Math.floor(this.titleT * 1.5) % 2 === 0)
+      text(ctx, 'Press Z to return', this.W / 2, this.H - 60, { align: 'center', size: 15, color: COLORS.textDim });
+  }
+
+  _renderVictory(ctx) {
+    ctx.fillStyle = '#2a0d0d'; ctx.fillRect(0, 0, this.W, this.H);
+    text(ctx, 'RUBEDO', this.W / 2, this.H / 2 - 80, { align: 'center', size: 46, color: '#f8a825' });
+    text(ctx, 'THE ALCHEMICAL STONE', this.W / 2, this.H / 2 - 32, { align: 'center', size: 18, color: '#f8e71c' });
+    text(ctx, 'The Dragon is undone. The Great Work is complete.', this.W / 2, this.H / 2 + 20, { align: 'center', size: 15, color: COLORS.text });
+
+    let yy = this.H / 2 + 70;
+    const stats = [
+      `Quests completed: ${this.hero?.questsDone || 0}`,
+      `Final gold: ${this.hero?.gold || 0}`,
+      `Level reached: ${this.hero?.level || 1}`,
+    ];
+    stats.forEach(stat => {
+      text(ctx, stat, this.W / 2, yy, { align: 'center', size: 13, color: COLORS.textDim });
+      yy += 20;
+    });
+
+    if (Math.floor(this.titleT * 1.5) % 2 === 0)
+      text(ctx, 'Press Z to return', this.W / 2, this.H - 60, { align: 'center', size: 15, color: COLORS.textDim });
   }
 
   _renderEnd(ctx, title, bg, sub) {
