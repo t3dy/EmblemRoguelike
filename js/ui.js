@@ -128,3 +128,78 @@ export class MessageBox {
     }
   }
 }
+
+// ---- A2: FURNACE UI PANEL ----
+/**
+ * Render the furnace operation status panel.
+ * Shows: temperature gauge, fuel bar, progress bar, materials list, operation name.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {number} x - Panel X position
+ * @param {number} y - Panel Y position
+ * @param {FurnaceOperation} operation - The active operation
+ * @param {Furnace} furnace - The furnace performing the operation
+ */
+export function renderFurnacePanel(ctx, x, y, operation, furnace) {
+  const panelW = 320, panelH = 280;
+
+  // Draw panel background and border
+  window9(ctx, x, y, panelW, panelH);
+
+  const pad = 15, lh = 24, barH = 16, barW = 260;
+  let cy = y + pad;
+
+  // ---- Title: Operation Name ----
+  text(ctx, 'FURNACE OPERATION', x + pad, cy, { size: 14, color: COLORS.hi });
+  cy += lh;
+
+  // ---- Temperature Gauge ----
+  const tempPercent = Math.min(1, furnace.temperature / 200); // 0-200°C range
+  const tempColor = tempPercent < 0.3 ? '#4a90e2'      // blue (cold)
+                  : tempPercent < 0.6 ? '#f5a623'      // orange (warming)
+                  : tempPercent < 0.85 ? '#f8e71c'     // yellow (hot)
+                  : '#e0584b';                           // red (very hot)
+
+  text(ctx, `Temp: ${Math.floor(furnace.temperature)}°C / ${operation.targetTemp}°C`, x + pad, cy, { size: 12 });
+  cy += 16;
+  bar(ctx, x + pad, cy, barW, barH, tempPercent, tempColor);
+  cy += barH + 8;
+
+  // ---- Fuel Bar ----
+  const fuelPercent = Math.min(1, furnace.fuel / furnace.fuelCapacity);
+  text(ctx, `Fuel: ${Math.floor(fuelPercent * 100)}%`, x + pad, cy, { size: 12 });
+  cy += 16;
+  bar(ctx, x + pad, cy, barW, barH, fuelPercent, '#8b6f47');
+  cy += barH + 8;
+
+  // ---- Progress Bar ----
+  const progressPercent = operation.progress / 100;
+  text(ctx, `Progress: ${Math.floor(operation.progress)}%`, x + pad, cy, { size: 12 });
+  cy += 16;
+  bar(ctx, x + pad, cy, barW, barH, progressPercent, COLORS.hpGreen);
+  cy += barH + 8;
+
+  // ---- Estimated Time Remaining ----
+  const remaining = Math.max(0, operation.duration - (Date.now() - operation.startTime));
+  const remainingSeconds = Math.ceil(remaining / 1000);
+  const mins = Math.floor(remainingSeconds / 60);
+  const secs = remainingSeconds % 60;
+  const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+  text(ctx, `Time: ${timeStr}`, x + pad, cy, { size: 12, color: COLORS.textDim });
+  cy += lh;
+
+  // ---- Materials List ----
+  text(ctx, 'Materials:', x + pad, cy, { size: 12, color: COLORS.hi });
+  cy += 16;
+
+  if (operation.materials && operation.materials.length > 0) {
+    for (const mat of operation.materials) {
+      const matName = mat.name || mat.id;
+      text(ctx, `  ${mat.qty}x ${matName}`, x + pad + 10, cy, { size: 11, color: COLORS.textDim });
+      cy += lh - 6;
+      if (cy > y + panelH - 20) break; // don't overflow
+    }
+  } else {
+    text(ctx, '  (none)', x + pad + 10, cy, { size: 11, color: COLORS.textDim });
+  }
+}

@@ -7,7 +7,10 @@ import { Town } from './town.js';
 import { Music } from './music.js?v=3';
 import { newHero, CLASSES, STAGES, stageForFloor, floorInfo, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats, ATTRIBS, ATTRIB_POINTS, ATTRIB_GAIN } from './data.js';
 import { EMBLEM_QUESTS } from './emblem_quests.js';
-import { MessageBox, window9, parchmentCard, text, menu, COLORS } from './ui.js';
+import { MessageBox, window9, parchmentCard, text, menu, COLORS, renderFurnacePanel } from './ui.js';
+import { FurnaceOperation } from './alchemical_integration.js';
+import { COURT_ECONOMY, calculateMaterialPrice, isMaterialAvailable, calculateRepairCost, getEconomicDescription } from './court_economy.js';
+import { MATERIALS } from './alchemical_materials.js';
 
 const ALL_QUESTS = [...QUESTS, ...EMBLEM_QUESTS];
 const QUEST_BY_ID = Object.fromEntries(ALL_QUESTS.map(q => [q.id, q]));
@@ -47,6 +50,10 @@ class Game {
     this.afterDialog = null;
     this.audio = makeAudio();
     this.music = new Music(() => this.audio.ctx());
+    this.activeOperation = null;       // A3: Current furnace operation (FurnaceOperation)
+    this.activeFurnace = null;         // A3: Reference to the furnace running the operation
+    this.activeNPCs = {};              // C1: Track NPCs in active room (npcId -> room)
+    this.dangerChoice = null;          // C1: Player choice when danger occurred
     this._bindKeys();
   }
 
@@ -200,6 +207,10 @@ class Game {
     this.questOffer = null;
     this.state = this.returnState;
     this.msg.push(`Charge taken: “${q.title}.”`);
+    // Special handling for emblem quests
+    if (q.emblem && (q.objective.kind === 'furnace_operation' || q.objective.kind === 'furnace_maintain' || q.objective.kind === 'furnace_cycle')) {
+      this.msg.push('This alchemical work requires a furnace in a castle. Seek out the castles and their lab spaces.');
+    }
     this.save();
   }
   declineQuest() { this.questOffer = null; this.state = this.returnState; }
@@ -249,6 +260,144 @@ class Game {
     this.save();
   }
 
+  /**
+   * C3: Complete quests triggered by furnace operation completion
+   * Called when a furnace operation finishes (status === 'completed')
+   */
+  _completeFurnaceQuests(operation) {
+    if (!this.hero) return;
+    if (!this.hero.quests || !this.hero.quests.length) return;
+
+    // Get completed quest IDs from operation
+    const completedQuestIds = operation.getCompletedQuests(this.hero);
+
+    for (const questId of completedQuestIds) {
+      const activeQuest = this.hero.quests.find(q => q.id === questId);
+      const questDef = QUEST_BY_ID[questId];
+
+      if (!activeQuest || !questDef) continue;
+
+      // Calculate rewards with multipliers
+      const rewards = operation.calculateRewards(questDef, this.hero, null);
+
+      // Apply rewards
+      const gains = [];
+      if (rewards.gold > 0) {
+        this.hero.gold += rewards.gold;
+        gains.push(`${rewards.gold} gold`);
+      }
+      if (rewards.xp > 0) {
+        this.hero.xp += rewards.xp;
+        gains.push(`${rewards.xp} EXP`);
+      }
+      if (rewards.items && rewards.items.length > 0) {
+        for (const item of rewards.items) {
+          const itemData = ITEMS[item.id];
+          if (itemData) {
+            this.hero.items[item.id] = (this.hero.items[item.id] || 0) + item.qty;
+            gains.push(`${item.qty}× ${itemData.name}`);
+          }
+        }
+      }
+
+      // Remove from active quests and track completion
+      this.hero.quests = this.hero.quests.filter(q => q.id !== questId);
+      this.hero.questsDone = (this.hero.questsDone || 0) + 1;
+
+      // Track emblem completion and phase progression
+      if (questDef.emblem !== undefined) {
+        this._trackEmblemCompletion(questDef.emblem, questId);
+      }
+
+      // Check for quest chain unlocks
+      if (questDef.unlock_next) {
+        this._unlockNextQuest(questDef.unlock_next);
+      }
+
+      // Play completion sound and show message
+      this.audio.play('level');
+      this.msg.push(`Charge fulfilled — “${questDef.title}”!`, `Reward: ${gains.join(', ')}.`);
+    }
+
+    this.save();
+  }
+
+  /**
+   * C3: Track emblem quest completion and phase progression
+   */
+  _trackEmblemCompletion(emblemNum, questId) {
+    const h = this.hero;
+    if (!h.alchemy) return;
+
+    // Add to completed emblems if not already there
+    if (!h.alchemy.completed_emblems.includes(emblemNum)) {
+      h.alchemy.completed_emblems.push(emblemNum);
+    }
+
+    // Check if we should unlock the next phase
+    this._checkEmblemPhaseUnlock(h);
+  }
+
+  /**
+   * C3: Check if phase progression criteria are met
+   * Foundation (1-2): 2 completed → unlock purification
+   * Purification (3-5): 3 completed → unlock union
+   * Union (6-9): 4 completed → unlock mastery
+   * etc.
+   */
+  _checkEmblemPhaseUnlock(hero) {
+    if (!hero.alchemy) return;
+
+    const completed = hero.alchemy.completed_emblems;
+    const currentPhase = hero.alchemy.emblem_phase || 0;
+
+    // Phase gates based on completed count
+    const phaseGates = [
+      { name: 'Foundation', required: 2, emblems: [1, 2] },
+      { name: 'Purification', required: 3, emblems: [3, 4, 5] },
+      { name: 'Union', required: 4, emblems: [6, 7, 8, 9] },
+      { name: 'Mastery', required: 5, emblems: [10, 11, 12, 16, 17] },
+      { name: 'Turning Point', required: 1, emblems: [26] },
+      { name: 'Advanced', required: 4, emblems: [13, 14, 15] },
+      { name: 'Celestial', required: 3, emblems: [23, 24, 28] },
+      { name: 'Mythological', required: 5, emblems: [29, 30, 47] },
+      { name: 'Final', required: 1, emblems: [48] },
+      { name: 'Ultimate', required: 2, emblems: [49, 50] },
+    ];
+
+    // Check each gate to see if we've unlocked a new phase
+    for (let i = currentPhase + 1; i < phaseGates.length; i++) {
+      const gate = phaseGates[i];
+      const gateCompleted = gate.emblems.filter(e => completed.includes(e)).length;
+
+      if (gateCompleted >= gate.required) {
+        hero.alchemy.emblem_phase = i;
+        this.msg.push(`🔮 New phase unlocked: ${gate.name}!`);
+
+        // Award skill unlocks for certain phases
+        if (!hero.alchemy.skill_unlocks.includes(gate.name.toLowerCase())) {
+          hero.alchemy.skill_unlocks.push(gate.name.toLowerCase());
+        }
+      }
+    }
+  }
+
+  /**
+   * C3: Unlock next quest in a chain
+   */
+  _unlockNextQuest(nextQuestId) {
+    if (!this.hero.quests) this.hero.quests = [];
+
+    // Check if already unlocked
+    if (this.hero.quests.some(q => q.id === nextQuestId)) return;
+
+    // Find quest definition
+    const nextQuestDef = QUEST_BY_ID[nextQuestId];
+    if (!nextQuestDef) return;
+
+    this.msg.push(`You've proven yourself. New tasks await: ${nextQuestDef.title}`);
+  }
+
   _die() {
     this.deathDepth = this.hero.depth || 0;
     this.recordDepth(this.deathDepth);
@@ -281,11 +430,301 @@ class Game {
         'KING: At the foot of the Opus coils the Alchemical Dragon. Slay it to win the Stone.',
         'KING: Take these Golden Apples — cast one down to flee any foe, as Atalanta did.',
         'KING: Return to my throne, or my Queen at her bower, for charges of the Work.',
+        'KING: My laboratories await those ready to perform the Work.',
         'Received 30 gold and 2 Golden Apples.'
       ], () => { this.hero.gold += 30; this.hero.items.apple = (this.hero.items.apple || 0) + 2; this.save(); });
     } else {
-      this.offerQuest('king');     // the King sets a charge from his throne
+      this.choice = {
+        title: 'Sun-Castle',
+        lines: ['Consult the King or visit the Laboratory?'],
+        options: [
+          { label: 'Consult the King', fn: () => { this.choice = null; this.offerQuest('king'); } },
+          { label: 'Visit Laboratory', fn: () => { this.choice = null; this._showLabMenu(); } },
+          { label: 'Leave Castle', fn: () => { this.choice = null; this.state = 'overworld'; } }
+        ],
+        sel: 0
+      };
+      this.state = 'choice';
     }
+  }
+
+  _showLabMenu() {
+    this.choice = {
+      title: 'Alchemical Laboratory',
+      lines: ['Select a lab space:'],
+      options: [
+        { label: 'Furnace Chamber (Calcination/Distillation)', fn: () => { this.choice = null; this._showFurnaceMenu('furnace_chamber'); } },
+        { label: 'Distillery (Purification)', fn: () => { this.choice = null; this._showFurnaceMenu('distillery'); } },
+        { label: 'Library (Study)', fn: () => { this.choice = null; this.msg.push('You study alchemical texts... Gained 5 XP.'); this.hero.xp += 5; this.state = 'overworld'; } },
+        { label: 'Garden (Gather)', fn: () => { this.choice = null; this.msg.push('You gather materials... Found 2 vitriol.'); this.hero.items.vitriol = (this.hero.items.vitriol || 0) + 2; this.state = 'overworld'; } },
+        { label: 'Tend to the Wounded', fn: () => { this.choice = null; this._showHealingMenu(); } },
+        { label: 'Back', fn: () => { this.choice = null; this.state = 'overworld'; } }
+      ],
+      sel: 0
+    };
+    this.state = 'choice';
+  }
+
+  // C2: Show healing menu to select an NPC to heal
+  _showHealingMenu() {
+    // Mock data for C2 (in full game, would query castle.getSickNPCs())
+    const sickNPCs = [
+      { id: 'master_alchemist', name: 'Master Cornelius', health_state: 'sickened' },
+      { id: 'apprentice', name: 'Young Wilhelm', health_state: 'injured' },
+    ];
+
+    if (sickNPCs.length === 0) {
+      this.msg.push('All the NPCs in the castle appear healthy.');
+      this.state = 'overworld';
+      return;
+    }
+
+    this.choice = {
+      title: 'Tend to the Wounded',
+      lines: ['Select an NPC to heal:'],
+      options: [
+        ...sickNPCs.map(npc => ({
+          label: `${npc.name} (${npc.health_state})`,
+          fn: () => { this.choice = null; this._showHealingItemMenu(npc); }
+        })),
+        { label: 'Back to Lab', fn: () => { this.choice = null; this._showLabMenu(); } }
+      ],
+      sel: 0
+    };
+    this.state = 'choice';
+  }
+
+  // C2: Show available healing items for applying to selected NPC
+  _showHealingItemMenu(npc) {
+    // Mock inventory of healing items (in full game, check hero.items)
+    const mockItems = [
+      { id: 'healing_ointment', name: 'Healing Ointment', potency: 9 },
+      { id: 'herbal_antidote', name: 'Herbal Antidote', potency: 8 },
+      { id: 'aloe_vera_gel', name: 'Aloe Vera Gel', potency: 9 },
+    ];
+
+    if (mockItems.length === 0) {
+      this.msg.push(`You have no healing items to treat ${npc.name}.`);
+      this.state = 'overworld';
+      return;
+    }
+
+    this.choice = {
+      title: `Treat ${npc.name}`,
+      lines: [`${npc.name} is ${npc.health_state}. Select a healing item:`],
+      options: [
+        ...mockItems.map(item => ({
+          label: item.name,
+          fn: () => { this.choice = null; this._applyHealing(npc, item); }
+        })),
+        { label: 'Cancel', fn: () => { this.choice = null; this._showHealingMenu(); } }
+      ],
+      sel: 0
+    };
+    this.state = 'choice';
+  }
+
+  // C2: Apply healing item to NPC
+  _applyHealing(npc, healingItem) {
+    const potency = healingItem.potency || 10;
+    const healing = potency + Math.floor(Math.random() * 20);
+
+    // Determine new health state (mock progression)
+    let newState = 'healthy';
+    if (npc.health_state === 'critical') newState = 'injured';
+    else if (npc.health_state === 'injured') newState = 'sickened';
+    else newState = 'healthy';
+
+    this.msg.push(
+      `You administer ${healingItem.name} to ${npc.name}.`,
+      `${npc.name} feels the treatment taking effect...`,
+      `${npc.name} is now ${newState}. (Reputation +10)`
+    );
+
+    // In full game, would call: castle.heal(npc.id, healingItem)
+    // and remove item from hero.items
+
+    this.state = 'overworld';
+    this.save();
+  }
+
+  _showFurnaceMenu(roomId) {
+    const OPERATIONS = ['calcination', 'dissolution', 'distillation', 'conjunction', 'fermentation'];
+
+    // C4: Get current furnace durability for display
+    let furnaceDurability = 100;
+    let repairCostMsg = '';
+    if (this.activeFurnace) {
+      furnaceDurability = Math.round(this.activeFurnace.durability || 100);
+      // Import would be circular; calculate inline for now
+      const baseCost = 25 + (100 - furnaceDurability) * 0.5;
+      repairCostMsg = ` (Durability: ${furnaceDurability}%, Repair cost: ${Math.round(baseCost)} gold)`;
+    }
+
+    this.choice = {
+      title: 'Furnace Operation',
+      lines: ['Select an operation:' + repairCostMsg],
+      options: [
+        ...OPERATIONS.map(op => ({
+          label: op.charAt(0).toUpperCase() + op.slice(1),
+          fn: () => {
+            this.choice = null;
+            // C1: Show material selection before starting operation
+            this._showMaterialSelection(op, roomId);
+          }
+        })),
+        // C4: Add repair option if furnace is damaged
+        furnaceDurability < 100 ? {
+          label: `Repair the Furnace (${furnaceDurability}%)`,
+          fn: () => { this.choice = null; this._showRepairConfirm(roomId, furnaceDurability); }
+        } : null,
+        { label: 'Back to Lab', fn: () => { this.choice = null; this._showLabMenu(); } }
+      ].filter(opt => opt !== null),
+      sel: 0
+    };
+    this.state = 'choice';
+  }
+
+  // C1: Show material selection UI before starting operation
+  _showMaterialSelection(operationId, roomId) {
+    const hero = this.hero;
+    const availableMaterialIds = Object.keys(hero.materials || {}).filter(id => (hero.materials[id] || 0) > 0);
+
+    if (availableMaterialIds.length === 0) {
+      this.msg.push('You have no alchemical materials to use in this operation.');
+      this._showFurnaceMenu(roomId);
+      return;
+    }
+
+    // Track selected materials and their quantities
+    this.selectedMaterials = this.selectedMaterials || {};
+    const selected = { ...this.selectedMaterials };
+
+    this.choice = {
+      title: `Select Materials for ${operationId.charAt(0).toUpperCase() + operationId.slice(1)}`,
+      lines: [
+        'Choose materials to place in the crucible.',
+        'Press ← to decrease qty, → to increase, Enter to confirm.',
+        ''
+      ],
+      options: [
+        ...availableMaterialIds.map(matId => ({
+          label: `${MATERIALS[matId].name} (have: ${hero.materials[matId]}, selected: ${selected[matId] || 0})`,
+          fn: () => {
+            // Increment selected qty for this material
+            const currentQty = selected[matId] || 0;
+            const maxAvailable = hero.materials[matId] || 0;
+            if (currentQty < maxAvailable) {
+              selected[matId] = currentQty + 1;
+              this._showMaterialSelection(operationId, roomId);
+            }
+          }
+        })),
+        { label: '--- Confirm & Start Operation ---', fn: () => {
+          this.choice = null;
+          const materials = Object.entries(selected)
+            .filter(([_, qty]) => qty > 0)
+            .map(([matId, qty]) => ({ id: matId, qty, name: MATERIALS[matId].name }));
+          this.selectedMaterials = {};
+          this.startFurnaceOperation(operationId, 80, materials, roomId);
+          this.state = 'overworld';
+        }},
+        { label: 'Back', fn: () => {
+          this.choice = null;
+          this._showFurnaceMenu(roomId);
+        } }
+      ],
+      sel: 0
+    };
+    this.state = 'choice';
+    this.selectedMaterials = selected;
+  }
+
+  // C4: Show repair confirmation dialog
+  _showRepairConfirm(roomId, currentDurability) {
+    const baseCost = 25 + (100 - currentDurability) * 0.5;
+    const repairCost = Math.round(baseCost);
+
+    if (this.hero.gold < repairCost) {
+      this.msg.push(`You lack the ${repairCost} gold required for repairs.`);
+      this.state = 'overworld';
+      return;
+    }
+
+    this.choice = {
+      title: 'Repair the Furnace',
+      lines: [`Repair cost: ${repairCost} gold. Confirm?`],
+      options: [
+        {
+          label: 'Confirm',
+          fn: () => {
+            this.choice = null;
+            this.hero.gold -= repairCost;
+            if (this.activeFurnace) {
+              this.activeFurnace.durability = 80;
+            }
+            this.msg.push('The furnace hums smoothly again.');
+            this.state = 'overworld';
+            this.save();
+          }
+        },
+        {
+          label: 'Cancel',
+          fn: () => { this.choice = null; this._showFurnaceMenu(roomId); }
+        }
+      ],
+      sel: 0
+    };
+    this.state = 'choice';
+  }
+
+  // A3: Start a furnace operation
+  /**
+   * Start a new furnace operation.
+   * @param {string} operationId - Operation identifier ('calcination', etc.)
+   * @param {number} targetTemp - Target temperature in Celsius (20-200)
+   * @param {Array} materials - Array of { id, qty, name } for materials in the crucible
+   */
+  startFurnaceOperation(operationId, targetTemp, materials, roomId = null) {
+    if (this.activeOperation && this.activeOperation.status === 'running') {
+      this.msg.push('A furnace operation is already in progress!');
+      return false;
+    }
+
+    // For now, create a mock Furnace object if we don't have one
+    // In a full implementation, this would come from the castle system
+    if (!this.activeFurnace) {
+      this.activeFurnace = {
+        temperature: 20,
+        targetTemp: targetTemp,
+        fuel: 20,
+        fuelCapacity: 20,
+        durability: 100
+      };
+    }
+
+    // C1: Get NPCs present in the room (if room is specified)
+    const npcsInRoom = [];
+    if (roomId && this.activeNPCs && this.activeNPCs[roomId]) {
+      const npcIds = this.activeNPCs[roomId];
+      if (Array.isArray(npcIds)) {
+        npcsInRoom.push(...npcIds);
+      } else if (typeof npcIds === 'string') {
+        npcsInRoom.push(npcIds);
+      }
+    }
+
+    // Create and start the operation with furnace durability and NPCs
+    this.activeOperation = new FurnaceOperation(
+      operationId,
+      materials,
+      targetTemp,
+      this.activeFurnace.durability || 100,
+      npcsInRoom
+    );
+    this.msg.push(`Beginning ${operationId} at ${targetTemp}°C...`);
+    this.msg.push(`Operation running. Check the panel in the top-right.`);
+    return true;
   }
   enterQueenCourt() {
     if (!this.hero.flags.metQueen) {
@@ -467,6 +906,43 @@ class Game {
     }
   }
 
+  // C1: Show danger choice dialog when furnace danger occurs
+  _showDangerChoice() {
+    if (!this.activeOperation || !this.activeOperation.triggered_danger) return;
+
+    const dangerData = this.activeOperation.getDangerChoice();
+    if (!dangerData) return;
+
+    const options = dangerData.options.map(opt => ({
+      label: opt.label,
+      fn: () => {
+        this._resolveDangerChoice(opt.value);
+      }
+    }));
+
+    this.openChoice(dangerData.title, [dangerData.description], options);
+  }
+
+  // C1: Apply consequences of player's choice for danger
+  _resolveDangerChoice(choice) {
+    if (!this.activeOperation) return;
+
+    const consequence = this.activeOperation.resolveDanger(choice, this.hero);
+    if (!consequence) return;
+
+    // Show consequence messages
+    for (const msg of consequence.messages) {
+      this.msg.push(msg);
+    }
+
+    // Update furnace durability if it was damaged
+    if (consequence.furnace_damage && this.activeFurnace) {
+      this.activeFurnace.durability = this.activeOperation.furnaceDurability;
+    }
+
+    this.save();
+  }
+
   _press(k) {
     // overlays intercept all input while open
     if (this.choice) { this._pressChoice(k); return; }
@@ -545,6 +1021,25 @@ class Game {
     this.msg.update(dt);
     this.titleT += dt;
     this.music.setArea(this._musicArea());
+
+    // A3: Tick active furnace operation
+    if (this.activeOperation && (this.activeOperation.status === 'running' || this.activeOperation.status === 'paused')) {
+      const tickResult = this.activeOperation.tick(dt);
+
+      // C1: Check if danger was triggered
+      if (tickResult && tickResult.danger_triggered) {
+        this.msg.push(`DANGER: ${tickResult.danger.name}!`);
+        this.msg.push(tickResult.danger.description);
+        this._showDangerChoice();
+      }
+      // Check if operation just completed
+      else if (this.activeOperation.status === 'completed') {
+        this.msg.push(`${this.activeOperation.operationId} complete!`);
+        // C3: Check and complete matching emblem quests
+        this._completeFurnaceQuests(this.activeOperation);
+      }
+    }
+
     if (this.state === 'overworld') {
       this.world.update(dt, this.input);
     } else if (this.state === 'dungeon' && this.dungeon) {
@@ -585,6 +1080,11 @@ class Game {
     }
     if (this.pause) this._renderPause(ctx);
     if (this.choice) this._renderChoice(ctx);
+
+    // A3: Render furnace operation panel if active
+    if (this.activeOperation && this.activeFurnace) {
+      renderFurnacePanel(ctx, this.W - 340, 20, this.activeOperation, this.activeFurnace);
+    }
   }
 
   _renderChoice(ctx) {

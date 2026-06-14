@@ -24,11 +24,28 @@ export class Furnace {
   }
 
   // Called each game tick (minute); adjusts actual temperature toward target
-  tick() {
+  // Also handles durability degradation and passive recovery
+  tick(dt = 1) {
     const diff = this.targetTemp - this.temperature;
     const heatRate = 2 * (this.durability / 100); // damage reduces heating speed
     const coolRate = 1;
 
+    // DURABILITY DEGRADATION (C4 Economic Systems)
+    // Base degradation: 0.1 * (currentTemp / 100) * dt
+    // Higher heat = faster wear
+    if (this.temperature > 20) {
+      const tempNormalized = Math.min(this.temperature / 100, 1);
+      const baseDegradation = 0.1 * tempNormalized * dt;
+      this.durability = Math.max(0, this.durability - baseDegradation);
+    }
+
+    // PASSIVE RECOVERY when idle and cool (< 50°C)
+    // Very slow recovery: +0.05 * dt durability
+    if (this.temperature < 50 && !this.vessel) {
+      this.durability = Math.min(100, this.durability + 0.05 * dt);
+    }
+
+    // Temperature control
     if (diff > 0 && this.fuel > 0) {
       // Heating: fuel is consumed
       this.temperature = Math.min(this.temperature + heatRate, this.targetTemp);
@@ -53,6 +70,11 @@ export class Furnace {
     if (this.vessel) return { error: 'Vessel already in use' };
     if (this.temperature < 30) return { error: 'Furnace not hot enough' };
 
+    // C4: Check if furnace is broken (durability < 10%)
+    if (this.durability < 10) {
+      return { error: 'Furnace is broken! Repair it first.' };
+    }
+
     this.vessel = {
       operationId,
       materials: [...materials],
@@ -61,6 +83,8 @@ export class Furnace {
       ticks: 0,
       stability: 100, // degrades with poor temperature management
       contaminated: false,
+      // C4: Store initial durability penalty to apply at completion
+      durabilityAtStart: this.durability,
     };
 
     return { success: true };
@@ -74,7 +98,14 @@ export class Furnace {
     if (!op) return null;
 
     this.vessel.ticks++;
-    this.vessel.progress = Math.min(100, (this.vessel.ticks / (op.duration || 30)) * 100);
+
+    // C4: Apply efficiency penalty based on durability
+    let durationMultiplier = 1.0;
+    if (this.durability < 50) durationMultiplier = 1.2; // 20% slower
+    if (this.durability < 30) durationMultiplier = 1.5; // 50% slower
+
+    const adjustedDuration = (op.duration || 30) * durationMultiplier;
+    this.vessel.progress = Math.min(100, (this.vessel.ticks / adjustedDuration) * 100);
 
     // Temperature variance damages stability
     const requiredTemp = op.requires?.temp || 'moderate';
@@ -88,6 +119,8 @@ export class Furnace {
     // Check for dangers
     const dangers = this._checkDangers();
     if (dangers.length > 0) {
+      // C4: When danger occurs, immediately apply durability penalty
+      this.durability = Math.max(0, this.durability - 5);
       return { dangers, progress: this.vessel.progress };
     }
 
@@ -195,8 +228,8 @@ export class Furnace {
       stability: this.vessel.stability,
     };
 
-    // Furnace durability decreases with use
-    this.durability = Math.max(0, this.durability - 5);
+    // C4: Durability now degrades during tick(), not at completion
+    // This encourages shorter operations to minimize wear
 
     // Reset vessel
     this.vessel = null;
@@ -212,9 +245,9 @@ export class Furnace {
   }
 
   // ---- MAINTENANCE ----
-  repair(amount = 30) {
-    // amount: gold spent on repairs
-    this.durability = Math.min(100, this.durability + amount / 10);
+  // C4: repair() restores furnace to 80% durability
+  repair() {
+    this.durability = 80;
   }
 
   setVentilation(level) {

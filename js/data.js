@@ -484,6 +484,8 @@ export function newHero(classId = 'knight', attribs = null) {
     gold: 30,
     items: { ...cls.items },
     spells: [...new Set([...spellsForLevel(1), ...cls.spells])],
+    // C1: Alchemical materials for furnace operations
+    materials: { charcoal: 3, vitriol: 2, sulfur: 2 },
     // overworld position (grid) — open ground just east of the Sun-Castle
     gx: 4, gy: 8, facing: 'down',
     flags: { metKing: false, dragonSlain: false },
