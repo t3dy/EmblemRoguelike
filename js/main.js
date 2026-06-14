@@ -256,12 +256,14 @@ class Game {
       h.flags.crowned = true; h.atk += 5; h.def += 4; gains.push('the Crown (+5 atk, +4 def)');
     }
     this.audio.play('level');
-    this.msg.push(`Charge fulfilled — “${def.title}”!`, `Reward: ${gains.join(', ')}.`);
+    const giver = def.giver === 'king' ? 'The King' : 'The Queen';
+    this.msg.push(`✓ Charge fulfilled — “${def.title}”!`);
+    this.msg.push(`Reward: ${gains.join(', ')}.`);
     // advance the Great Work
     if (def.line === 'opus') {
       h.opusStep = Math.max(h.opusStep || 0, def.step);
-      if (def.step >= OPUS_LINE.length) this.msg.push('The Great Work is all but accomplished — descend, and face the Dragon!');
-      else this.msg.push('The Great Work advances. Seek the next royal charge.');
+      if (def.step >= OPUS_LINE.length) this.msg.push('▸ The Great Work is all but accomplished — descend, and face the Dragon!');
+      else this.msg.push('▸ The Great Work advances. Seek the next royal charge.');
     }
     this.save();
   }
@@ -432,6 +434,8 @@ class Game {
     if (!this.hero.flags.metKing) {
       this.hero.flags.metKing = true;
       this.dialog([
+        'You enter the Sun-Castle, its walls inscribed with secret glyphs.',
+        'The KING sits upon a throne of alchemical symbols.',
         'KING: Adept, the Work descends through four stages — Nigredo, Albedo, Citrinitas, Rubedo.',
         'KING: At the foot of the Opus coils the Alchemical Dragon. Slay it to win the Stone.',
         'KING: Take these Golden Apples — cast one down to flee any foe, as Atalanta did.',
@@ -718,14 +722,18 @@ class Game {
       this.activeFurnace.durability || 100,
       npcsInRoom
     );
-    this.msg.push(`Beginning ${operationId} at ${targetTemp}°C...`);
-    this.msg.push(`Operation running. Check the panel in the top-right.`);
+    const opDisplay = operationId.charAt(0).toUpperCase() + operationId.slice(1);
+    this.msg.push(`▸ Beginning ${opDisplay}`);
+    this.msg.push(`▸ Target: ${targetTemp}°C | Materials: ${totalMats} units`);
+    this.msg.push(`▸ Monitor the operation panel (top-right). Press ESC to return.`);
     return true;
   }
   enterQueenCourt() {
     if (!this.hero.flags.metQueen) {
       this.hero.flags.metQueen = true;
       this.dialog([
+        'You emerge into a moonlit garden. The Queen\'s bower rises before you, shimmering.',
+        'The QUEEN awaits, crowned with silver starlight.',
         'QUEEN: I am Luna, sister and bride to the Sun. The volatile is mine to rule.',
         'QUEEN: Come to my bower for charges of the whitening and the gathering.'
       ], () => this.save());
@@ -1028,13 +1036,16 @@ class Game {
 
       // C1: Check if danger was triggered
       if (tickResult && tickResult.danger_triggered) {
-        this.msg.push(`DANGER: ${tickResult.danger.name}!`);
-        this.msg.push(tickResult.danger.description);
+        this.msg.push(`⚠ DANGER: ${tickResult.danger.name}!`);
+        this.msg.push(`▸ ${tickResult.danger.description}`);
         this._showDangerChoice();
+        this.audio.play('warning'); // auditory alert for danger
       }
       // Check if operation just completed
       else if (this.activeOperation.status === 'completed') {
-        this.msg.push(`${this.activeOperation.operationId} complete!`);
+        const opName = this.activeOperation.operationId.charAt(0).toUpperCase() + this.activeOperation.operationId.slice(1);
+        this.msg.push(`✓ ${opName} complete!`);
+        this.msg.push(`Progress: ${Math.round(this.activeOperation.progress)}% | Fuel: ${this.activeOperation.fuel.toFixed(1)}`);
         // C3: Check and complete matching emblem quests
         this._completeFurnaceQuests(this.activeOperation);
       }

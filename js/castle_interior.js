@@ -442,6 +442,65 @@ export class Castle {
     const availabilityPct = this.available_materials[rarity] || 0.5;
     return Math.random() < availabilityPct;
   }
+
+  // C4: Get dialogue for an NPC based on their role, disposition, and current state
+  getNPCDialogue(npcId) {
+    const npc = this.NPCs[npcId];
+    if (!npc) return null;
+
+    const dialogueByRole = {
+      patron: [
+        'The Work demands both caution and audacity.',
+        'Your progress pleases me. Continue thus.',
+        'The dragon awaits those worthy of its blood.',
+        'The Stone is within reach if you persist.',
+      ],
+      mentor: [
+        'Tend the furnace with patience, apprentice.',
+        'Watch for the seven signs of transformation.',
+        'The materials speak if you listen with care.',
+        'Master the small operations before attempting the Great Work.',
+      ],
+      scholar: [
+        'The alchemists speak in riddles, but their meaning is clear.',
+        'I have read the texts of Jabir and Rupescissa both.',
+        'Seek the hidden in what appears obvious.',
+        'The plague teaches us much about the body's hidden nature.',
+      ],
+      trader: [
+        'Fine materials, these. They cost dearly for good reason.',
+        'The market favors those with coin and patience.',
+        'I trade only in the purest substances.',
+        'Word travels fast — your reputation precedes you.',
+      ],
+      student: [
+        'Master Cornelius is teaching me the sacred operations!',
+        'Will you show me how the furnace works, adept?',
+        'I hope to work the Great Work someday, like you!',
+        'The materials are so strange and beautiful...',
+      ],
+    };
+
+    const role = npc.role || 'student';
+    const messages = dialogueByRole[role] || dialogueByRole.student;
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+
+  // Get a greeting based on NPC disposition
+  getNPCGreeting(npcId) {
+    const npc = this.NPCs[npcId];
+    if (!npc) return 'Greetings.';
+
+    const greetingsByDisposition = {
+      helpful: `${npc.name} nods warmly. "Well met, adept."`,
+      curious: `${npc.name} eyes you with interest. "What brings you to my chamber?"`,
+      greedy: `${npc.name} eyes you shrewdly. "What brings profit to us both?"`,
+      eager: `${npc.name} brightens. "Oh, hello! Will you teach me something new?"`,
+      neutral: `${npc.name} regards you coolly. "What is your purpose?"`,
+    };
+
+    return greetingsByDisposition[npc.disposition] || greetingsByDisposition.neutral;
+  }
 }
 
 // ---- MULTI-CASTLE SYSTEM ----
