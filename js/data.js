@@ -207,6 +207,27 @@ export const CLASSES = [
     items: { herb: 3, potion: 1, apple: 1 }, spells: [],
     passive: 'Pursuer: +15% attack damage.', passiveKey: 'pursuer',
   },
+  {
+    id: 'soror', name: 'Soror Mystica', sprite: 'c_atalanta',
+    blurb: 'The mystic sister who tends the Work — frail, but mistress of cleansing.',
+    mods: { maxHp: -6, atk: -2, def: 0, maxMp: +12 },
+    items: { herb: 2, ardens: 2 }, spells: ['HEAL', 'WASH'],
+    passive: 'Purify: starts knowing Heal & Wash; +MP each level.', passiveKey: 'opus',
+  },
+  {
+    id: 'senex', name: 'Saturnine Senex', sprite: 'sage',
+    blurb: 'The leaden elder — slow and grim, but armoured against all harm.',
+    mods: { maxHp: +14, atk: 0, def: +4, maxMp: -2 },
+    items: { herb: 3, theriac: 1 }, spells: [],
+    passive: 'Leaden Hide: −2 to all incoming damage.', passiveKey: 'leaden',
+  },
+  {
+    id: 'hermes', name: 'Hermes-Magus', sprite: 'villager',
+    blurb: 'Guide of souls between worlds — turns blood to gold and slips any snare.',
+    mods: { maxHp: -2, atk: +1, def: 0, maxMp: +4 },
+    items: { herb: 2, apple: 2 }, spells: [],
+    passive: 'Caduceus: flees any non-boss; 10% of damage becomes gold.', passiveKey: 'caduceus',
+  },
 ];
 export const CLASS_BY_ID = Object.fromEntries(CLASSES.map(c => [c.id, c]));
 
@@ -301,6 +322,33 @@ export const QUESTS = [
     objective: { kind: 'reach', deeper: 2 },
     reward: { xp: 18, item: ['herb', 1] } },
 
+  // --- research-derived charges (Rupescissa/Bacon/Nummedal/Maier) ---
+  { id: 'q_theriac', giver: 'queen', roman: '—', title: 'Theriac for the Plague',
+    call: 'Brew the universal antidote from the flesh of the Tyrian viper.',
+    poem: ['From the viper’s bane the cure is wrung,', 'and the plague-struck ward finds breath and tongue.'],
+    objective: { kind: 'slayType', monId: 'viper', target: 3 },
+    reward: { item: ['theriac', 2], gold: 20 } },
+  { id: 'q_fifth', giver: 'queen', roman: '—', title: 'The Fifth Essence',
+    call: 'Distil the incorruptible quintessence from the matter of the floors.',
+    poem: ['Draw off the heaven hid in earthly dross —', 'the fifth pure essence, gain without loss.'],
+    objective: { kind: 'collect', target: 3 },
+    reward: { item: ['quinta', 1], xp: 20 } },
+  { id: 'k_greenlion', giver: 'king', roman: 'XXXVII', title: 'Slay the Green Lion',
+    call: 'The green lion swallows the sun; take its blood for the Work.',
+    poem: ['The green beast gnaws the golden sun —', 'spill its blood and the gold is won.'],
+    objective: { kind: 'slayType', monId: 'green_lion', target: 1, alt: 'lion' },
+    reward: { gold: 80, item: ['aurum', 1] } },
+  { id: 'k_assay', giver: 'king', roman: '—', title: 'Assay the Ore',
+    call: 'Learn to tell true gold from gilded counterfeit.',
+    poem: ['On the touchstone the truth is read —', 'real gold, or a charlatan’s lead.'],
+    objective: { kind: 'gold', target: 50 },
+    reward: { xp: 15, item: ['herb', 2] } },
+  { id: 'q_gratis', giver: 'queen', roman: '—', title: 'Cure Them Gratis',
+    call: 'Heal the sick and take no payment — the Rose-Cross rule.',
+    poem: ['Wear no badge and charge no fee;', 'heal the poor, and hidden be.'],
+    objective: { kind: 'collect', target: 4 },
+    reward: { item: ['apple', 1], xp: 12 } },
+
   // --- THE GREAT WORK questline (chained, in order, culminates at the Dragon) ---
   { id: 'opus1', giver: 'king', line: 'opus', step: 1, roman: 'XIV', title: 'The Great Work I — Nigredo',
     call: 'This is the dragon that devours its own tail.',
@@ -337,6 +385,9 @@ const START_GEAR = {
   alchemist:  { weapon: 'dagger', armor: 'leather' },
   atalanta:   { weapon: 'dagger', armor: 'leather' },
   hippomenes: { weapon: 'sword',  armor: 'leather' },
+  soror:      { weapon: 'dagger', armor: 'whiterobe' },
+  senex:      { weapon: 'sword',  armor: 'mail' },
+  hermes:     { weapon: 'dagger', armor: 'leather' },
 };
 
 // starting hero for a chosen class

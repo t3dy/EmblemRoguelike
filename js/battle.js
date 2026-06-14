@@ -156,6 +156,7 @@ export class Battle {
     const d = this._dmg(eatk, this._effDef('mon', this.mon.def));
     if (this.hero.passiveKey === 'pursuer') d.value = Math.ceil(d.value * 1.15);
     this.mon.hp -= d.value; this.mon._hit = true;
+    if (this.hero.passiveKey === 'caduceus') this.hero.gold += Math.max(1, Math.floor(d.value * 0.1));
     this.flash = 0.35; this.shake = 0.3;
     this.game.sfx('hit');
     let extra = '';
@@ -246,6 +247,10 @@ export class Battle {
       this.game.msg.push(`${this.hero.name} is too swift to catch — fled!`);
       this.result = 'run'; this.pendingResolve = () => this._finish(); return;
     }
+    if (this.hero.passiveKey === 'caduceus' && !this.mon.boss) {
+      this.game.msg.push(`${this.hero.name} slips between worlds — escaped!`);
+      this.result = 'run'; this.pendingResolve = () => this._finish(); return;
+    }
     if (this.mon.boss) { this.game.msg.push('The Dragon blocks your escape!'); this.pendingResolve = () => this._enemyTurn(); return; }
     const ok = Math.random() < 0.6;
     if (ok) { this.game.msg.push('The Knight fled!'); this.result = 'run'; this.pendingResolve = () => this._finish(); }
@@ -297,6 +302,7 @@ export class Battle {
       d = this._dmg(this._effAtk('mon', this.mon.atk), this._effDef('hero', this.hero.def));
       label = `${this.mon.name} attacks!`; this.game.sfx('hit');
     }
+    if (this.hero.passiveKey === 'leaden') d.value = Math.max(1, d.value - 2);
     this.hero.hp -= d.value; this.heroFlash = 0.4; this.shake = 0.3;
     if (this.mon.special === 'lifesteal') this.mon.hp = Math.min(this.mon.maxHp, this.mon.hp + Math.floor(d.value / 2));
     let extra = '';
