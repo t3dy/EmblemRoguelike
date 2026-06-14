@@ -166,17 +166,17 @@
     "kind": "structure",
     "label": "Sun-Castle",
     "file": "assets/sprites/s_castle.png",
-    "w": 144,
-    "h": 96,
-    "src": "Kenney Tiny Town (CC0)"
+    "w": 45,
+    "h": 160,
+    "src": "assets/extracted_all/cramer_page_0097/individual/castle_transparent.png"
   },
   {
     "name": "s_tower",
     "kind": "structure",
     "label": "Watchtower",
     "file": "assets/sprites/s_tower.png",
-    "w": 86,
-    "h": 140,
+    "w": 53,
+    "h": 94,
     "src": "assets/extracted_all/cramer_page_0077/individual/tower_transparent.png"
   },
   {
@@ -184,17 +184,17 @@
     "kind": "structure",
     "label": "Village",
     "file": "assets/sprites/s_town.png",
-    "w": 96,
-    "h": 144,
-    "src": "Kenney Tiny Town (CC0)"
+    "w": 160,
+    "h": 132,
+    "src": "assets/extracted_all/stolcius_plate_069/individual/building_house_transparent.png"
   },
   {
     "name": "s_gate",
     "kind": "structure",
     "label": "Stone Bridge",
     "file": "assets/sprites/s_gate.png",
-    "w": 150,
-    "h": 139,
+    "w": 128,
+    "h": 117,
     "src": "assets/extracted_all/mclean_second_p0050/individual/gate_bridge_transparent.png"
   },
   {
@@ -202,53 +202,53 @@
     "kind": "structure",
     "label": "Dungeon Door",
     "file": "assets/sprites/s_door.png",
-    "w": 144,
-    "h": 96,
-    "src": "Kenney Tiny Town (CC0)"
+    "w": 40,
+    "h": 160,
+    "src": "assets/extracted_all/emblem-08/individual/door_transparent.png"
   },
   {
     "name": "t_forest",
     "kind": "terrain",
     "label": "Forest",
     "file": "assets/sprites/t_forest.png",
-    "w": 64,
-    "h": 48,
-    "src": "Kenney Tiny Town (CC0)"
+    "w": 34,
+    "h": 128,
+    "src": "assets/extracted_all/stolcius_plate_076/individual/tree_transparent.png"
   },
   {
     "name": "t_mountain",
     "kind": "terrain",
     "label": "Mountain",
     "file": "assets/sprites/t_mountain.png",
-    "w": 120,
-    "h": 76,
-    "src": "assets/extracted_all/stolcius_plate_005/individual/mountain_hill_transparent.png"
+    "w": 128,
+    "h": 45,
+    "src": "assets/extracted_all/khunrath_p0026/individual/mountain_hill_transparent.png"
   },
   {
     "name": "t_mountain2",
     "kind": "terrain",
     "label": "Peaks",
     "file": "assets/sprites/t_mountain2.png",
-    "w": 130,
-    "h": 65,
-    "src": "assets/extracted_all/emblem-46/individual/mountain_hill_transparent.png"
+    "w": 127,
+    "h": 29,
+    "src": "assets/extracted_all/maier_arcana_p0180/individual/cliff_transparent.png"
   },
   {
     "name": "t_cave",
     "kind": "terrain",
     "label": "Cave",
     "file": "assets/sprites/t_cave.png",
-    "w": 108,
-    "h": 120,
-    "src": "assets/extracted_all/mclean_second_p0056/individual/cave_transparent.png"
+    "w": 62,
+    "h": 127,
+    "src": "assets/extracted_all/obrist_debuts_p0075/individual/cave_transparent.png"
   },
   {
     "name": "t_cliff",
     "kind": "terrain",
     "label": "Cliff",
     "file": "assets/sprites/t_cliff.png",
-    "w": 120,
-    "h": 30,
+    "w": 127,
+    "h": 29,
     "src": "assets/extracted_all/maier_arcana_p0180/individual/cliff_transparent.png"
   },
   {
@@ -256,9 +256,9 @@
     "kind": "terrain",
     "label": "Woods",
     "file": "assets/sprites/t_forest2.png",
-    "w": 48,
-    "h": 64,
-    "src": "Kenney Tiny Town (CC0)"
+    "w": 46,
+    "h": 128,
+    "src": "assets/extracted_all/rosarium_page_0043/individual/tree_bush_transparent.png"
   },
   {
     "name": "d_sun",
@@ -400,8 +400,8 @@
     "kind": "structure",
     "label": "Shrine",
     "file": "assets/sprites/s_altar.png",
-    "w": 120,
-    "h": 50,
+    "w": 128,
+    "h": 52,
     "src": "assets/extracted_all/emblem-08/individual/altar_transparent.png"
   },
   {
@@ -409,8 +409,8 @@
     "kind": "terrain",
     "label": "River",
     "file": "assets/sprites/t_water.png",
-    "w": 130,
-    "h": 76,
+    "w": 128,
+    "h": 73,
     "src": "assets/extracted_all/mclean_second_p0037/individual/river_sea_transparent.png"
   },
   {
@@ -418,8 +418,8 @@
     "kind": "terrain",
     "label": "Garden",
     "file": "assets/sprites/t_garden.png",
-    "w": 110,
-    "h": 107,
+    "w": 128,
+    "h": 123,
     "src": "assets/extracted_all/maier_arcana_p0071/individual/flower_transparent.png"
   },
   {

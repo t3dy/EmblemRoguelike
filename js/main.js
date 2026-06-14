@@ -6,9 +6,15 @@ import { Dungeon } from './dungeon.js';
 import { Town } from './town.js';
 import { Music } from './music.js?v=3';
 import { newHero, CLASSES, STAGES, stageForFloor, floorInfo, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats, ATTRIBS, ATTRIB_POINTS, ATTRIB_GAIN } from './data.js';
+import { EMBLEM_QUESTS } from './emblem_quests.js';
 import { MessageBox, window9, parchmentCard, text, menu, COLORS } from './ui.js';
 
-const QUEST_BY_ID = Object.fromEntries(QUESTS.map(q => [q.id, q]));
+const ALL_QUESTS = [...QUESTS, ...EMBLEM_QUESTS];
+const QUEST_BY_ID = Object.fromEntries(ALL_QUESTS.map(q => [q.id, q]));
+
+function allQuestsByGiver(who) {
+  return ALL_QUESTS.filter(q => q.giver === who && q.line !== 'opus');
+}
 
 const SAVE_KEY = 'emblem_knight_save_v1';
 const SCORE_KEY = 'emblem_knight_score_v1';
@@ -176,8 +182,8 @@ class Game {
       quest = nextOpus;
     } else {
       const done = new Set(this.hero._questsSeen || []);
-      let pool = questsByGiver(who).filter(q => !held.has(q.id) && !done.has(q.id));
-      if (pool.length === 0) pool = questsByGiver(who).filter(q => !held.has(q.id));
+      let pool = allQuestsByGiver(who).filter(q => !held.has(q.id) && !done.has(q.id));
+      if (pool.length === 0) pool = allQuestsByGiver(who).filter(q => !held.has(q.id));
       if (pool.length) quest = pool[Math.floor(Math.random() * pool.length)];
       else if (nextOpus && !held.has(nextOpus.id)) quest = nextOpus;   // fall back to the Work
     }
@@ -624,6 +630,19 @@ class Game {
     if (o.kind === 'gold') return `Gather ${o.target} gold.`;
     if (o.kind === 'reach' && o.stage) return `Reach the ${o.stage.toUpperCase()} stage.`;
     if (o.kind === 'reach' && o.deeper) return `Descend ${o.deeper} floors deeper.`;
+    // Emblem quest objectives
+    if (o.kind === 'furnace_operation') return `Perform a ${o.operation} operation in the furnace.`;
+    if (o.kind === 'furnace_maintain') return `Maintain furnace heat at ${o.target_temp}°C for ${o.duration} minutes.`;
+    if (o.kind === 'npc_reconcile') return `Reconcile two NPCs and broker their union.`;
+    if (o.kind === 'furnace_cycle') return `Complete ${o.cycles} full cycles of furnace operation.`;
+    if (o.kind === 'garden_tend') return `Tend the garden and harvest materials.`;
+    if (o.kind === 'furnace_balance') return `Balance opposing forces with precision.`;
+    if (o.kind === 'furnace_sequence') return `Complete a sequence of operations flawlessly.`;
+    if (o.kind === 'study_and_purify') return `Study texts and perform purification.`;
+    if (o.kind === 'dual_track') return `Master both study and practice; seek wisdom.`;
+    if (o.kind === 'furnace_conjunction') return `Achieve perfect conjunction of materials.`;
+    if (o.kind === 'furnace_multi_stage') return `Complete a ${o.stages}-stage multi-day operation.`;
+    if (o.kind === 'furnace_final_dissolution') return `Perform the ultimate alchemical work.`;
     return 'Complete the Work.';
   }
   _rewardText(r) {
