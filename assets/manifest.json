@@ -166,9 +166,9 @@
     "kind": "structure",
     "label": "Sun-Castle",
     "file": "assets/sprites/s_castle.png",
-    "w": 160,
-    "h": 115,
-    "src": "assets/extracted_all/stolcius_plate_002/individual/castle_transparent.png"
+    "w": 144,
+    "h": 96,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "s_tower",
@@ -184,9 +184,9 @@
     "kind": "structure",
     "label": "Village",
     "file": "assets/sprites/s_town.png",
-    "w": 91,
-    "h": 150,
-    "src": "assets/extracted_all/emblem-28/individual/tower_chimney_transparent.png"
+    "w": 96,
+    "h": 144,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "s_gate",
@@ -202,18 +202,18 @@
     "kind": "structure",
     "label": "Dungeon Door",
     "file": "assets/sprites/s_door.png",
-    "w": 32,
-    "h": 120,
-    "src": "assets/extracted_all/emblem-08/individual/door_transparent.png"
+    "w": 144,
+    "h": 96,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "t_forest",
     "kind": "terrain",
     "label": "Forest",
     "file": "assets/sprites/t_forest.png",
-    "w": 110,
-    "h": 43,
-    "src": "assets/extracted_all/stolcius_plate_031/individual/forest_transparent.png"
+    "w": 64,
+    "h": 48,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "t_mountain",
@@ -256,9 +256,9 @@
     "kind": "terrain",
     "label": "Woods",
     "file": "assets/sprites/t_forest2.png",
-    "w": 110,
-    "h": 83,
-    "src": "assets/extracted_all/stolcius_plate_061/individual/forest_transparent.png"
+    "w": 48,
+    "h": 64,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "d_sun",
@@ -373,27 +373,27 @@
     "kind": "structure",
     "label": "Cottage",
     "file": "assets/sprites/s_house.png",
-    "w": 130,
-    "h": 109,
-    "src": "assets/extracted_all/cramer_page_0045/individual/building_house_transparent.png"
+    "w": 96,
+    "h": 96,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "s_church",
     "kind": "structure",
     "label": "Chapel",
     "file": "assets/sprites/s_church.png",
-    "w": 160,
-    "h": 119,
-    "src": "assets/extracted_all/stolcius_plate_094/individual/castle_building_temp_transparent.png"
+    "w": 96,
+    "h": 96,
+    "src": "Kenney Tiny Town (CC0)"
   },
   {
     "name": "s_furnace",
     "kind": "structure",
     "label": "Athanor",
     "file": "assets/sprites/s_furnace.png",
-    "w": 120,
-    "h": 106,
-    "src": "assets/extracted_all/stolcius_plate_059/individual/furnace_door_transparent.png"
+    "w": 128,
+    "h": 44,
+    "src": "Kenney Roguelike/RPG pack (CC0)"
   },
   {
     "name": "s_altar",

@@ -7,3 +7,6 @@ Noor Shaker Julian Togelius Mark J Nelson Procedural Content Generation in Games
 Thumbs.db
 __pycache__/
 *.pyc
+
+# downloaded art source packs / scratch
+.artwork_src/

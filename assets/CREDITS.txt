@@ -1,0 +1,11 @@
+# Art credits
+
+Pixel-art terrain decor and buildings (t_forest, t_forest2, s_town, s_house,
+s_castle, s_door, s_church, s_furnace) are derived from Kenney asset packs,
+all released under Creative Commons Zero (CC0, public domain):
+
+- Tiny Town  — https://kenney.nl/assets/tiny-town
+- Roguelike/RPG pack (forge) — https://kenney.nl/assets/roguelike-rpg-pack
+
+All other sprites are extracted from public-domain alchemical emblem engravings
+(Stolcius, Maier, et al.).
