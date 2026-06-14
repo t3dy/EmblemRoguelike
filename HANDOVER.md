@@ -44,6 +44,15 @@ browser may cache old JS — see §7).
 
 ## 3. Current status — everything below is DONE and verified
 
+> **Latest (2026-06-13): woodcut aesthetic overhaul — shipped & deployed.**
+> All terrain + structure sprites are now public-domain emblem-engraving cutouts
+> run through a woodcut pipeline (grayscale auto-levels → threshold to B&W lines →
+> sepia parchment tone → unsharp mask). A global canvas CSS filter
+> (`sepia(.22) contrast(1.10) brightness(.96)`) unifies the whole scene; the old
+> CC0 Kenney pixel-art terrain is gone. The pipeline runs entirely in Python/PIL
+> (no Read-tool image inspection — that was throwing "image couldn't be processed").
+> Commit `4f67154`, live on Pages.
+
 - 35 emblem sprites (hero/classes, monsters, NPCs, structures, terrain, title Sol).
 - Isometric overworld hub: Sun-Castle (King), Queen's bower, Town (rest), wild
   encounters, eastern stair into the dungeon. West→east difficulty gradient.
@@ -69,11 +78,11 @@ browser may cache old JS — see §7).
 
 ```
 EmblemRoguelike/
-  index.html              loads the game (script: js/main.js?v=2)
+  index.html              loads the game (script: js/main.js?v=3)
   css/style.css
   js/
     main.js     state machine, input, game loop, save, permadeath, char-select,
-                quests, audio SFX, title/end screens   (imports music.js?v=2)
+                quests, audio SFX, title/end screens   (imports music.js?v=3)
     data.js     ALL content data: MAP, MONSTERS, CLASSES, STAGES, QUESTS/OPUS_LINE,
                 REGION_POOLS, SPELLS, ITEMS, level curve   <-- edit gameplay here
     world.js    isometric overworld renderer + movement
@@ -151,7 +160,13 @@ structure. The raw MIDIs are **not** in this repo (they were in EmblemPrintShop'
   `canvas.toDataURL()` for frames (see how earlier work verified states).
 - **Audio needs a user gesture.** Music starts on the first key press (browser
   autoplay rule). **M** toggles it; `window.__game.music.stop()` silences it.
-- **Two local copies** exist (here + EmblemPrintShop/game). Edit here only.
+- **Two local copies** exist (here + `EmblemPrintShop/game/`). **`EmblemRoguelike`
+  is canonical and far ahead** — verified 2026-06-13: 16 JS modules vs 8, main.js
+  991 vs 647 lines, data.js 499 vs 303, manifest 523 vs 424. The PrintShop copy is
+  a stale snapshot; copying *from* it would regress this repo. Edit here only. The
+  only thing unique to PrintShop is `game/_curation/` (44 MB of build scratch:
+  contact sheets, frame captures, curation scripts) — kept there deliberately, not
+  game runtime content.
 
 ---
 
@@ -160,7 +175,7 @@ structure. The raw MIDIs are **not** in this repo (they were in EmblemPrintShop'
 This repo auto-deploys via **GitHub Pages** (Settings → Pages: branch `main`, `/`
 root; already enabled). After editing:
 ```
-git add -A
+git add <specific files you changed>     # never `git add -A` (user rule)
 git commit -m "what changed"
 git push
 ```
