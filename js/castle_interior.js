@@ -465,7 +465,7 @@ export class Castle {
         'The alchemists speak in riddles, but their meaning is clear.',
         'I have read the texts of Jabir and Rupescissa both.',
         'Seek the hidden in what appears obvious.',
-        'The plague teaches us much about the body's hidden nature.',
+        'The plague teaches us much about the body\'s hidden nature.',
       ],
       trader: [
         'Fine materials, these. They cost dearly for good reason.',
