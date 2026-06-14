@@ -59,18 +59,46 @@ export const MONSTERS = {
   lion:      { id:'lion',      name:'The Red Lion',sprite:'m_lion',      hp:54,  atk:26, def:12, xp:32, gold:30, scale:0.85, spell:null },
   wyrm:      { id:'wyrm',      name:'Coiling Wyrm',sprite:'m_wyrm',      hp:72,  atk:27, def:12, xp:50, gold:55, scale:0.95, spell:'BURN' },
   ouroboros: { id:'ouroboros', name:'Ouroboros Wyrm', sprite:'m_ouroboros', hp:84, atk:29, def:13, xp:62, gold:70, scale:1.0, spell:'BURN' },
+  // --- expansion beasts (more early/mid variety) ---
+  dove:      { id:'dove',      name:'White Dove',   sprite:'m_dove',      hp:12, atk:7,  def:3,  xp:4,  gold:4,  scale:0.5,  spell:null },
+  fish:      { id:'fish',      name:'River Fish',   sprite:'m_fish',      hp:14, atk:8,  def:4,  xp:5,  gold:4,  scale:0.5,  spell:null },
+  tortoise:  { id:'tortoise',  name:'Stone Tortoise',sprite:'m_tortoise', hp:28, atk:6,  def:13, xp:9,  gold:7,  scale:0.6,  spell:null },
+  peacock:   { id:'peacock',   name:'Cauda Pavonis',sprite:'m_peacock',   hp:24, atk:13, def:7,  xp:12, gold:16, scale:0.75, spell:null },
+  eagle:     { id:'eagle',     name:'Eagle',        sprite:'m_eagle',     hp:24, atk:18, def:6,  xp:14, gold:10, scale:0.75, spell:null },
+  horse:     { id:'horse',     name:'Night-Mare',   sprite:'m_horse',     hp:32, atk:17, def:8,  xp:15, gold:12, scale:0.8,  spell:null },
   dragon:    { id:'dragon',    name:'The Alchemical Dragon', sprite:'m_dragon', hp:160, atk:36, def:17, xp:240, gold:340, scale:1.0, spell:'BURN', boss:true },
+};
+
+// ---- Equipment ---------------------------------------------------------------
+// weapons add to attack, armour adds to defence (folded into stats on equip).
+export const WEAPONS = {
+  fists:     { id:'fists',     name:'Bare Fists',     atk:0,  cost:0,   desc:'Nothing in hand.' },
+  dagger:    { id:'dagger',    name:'Bronze Dagger',  atk:3,  cost:30,  desc:'+3 attack' },
+  sword:     { id:'sword',     name:'Iron Sword',     atk:7,  cost:90,  desc:'+7 attack' },
+  falchion:  { id:'falchion',  name:'Steel Falchion', atk:12, cost:220, desc:'+12 attack' },
+  flameblade:{ id:'flameblade',name:'Flaming Sword',  atk:18, cost:500, desc:'+18 attack' },
+};
+export const ARMOR = {
+  rags:    { id:'rags',    name:'Linen Robe',    def:0,  cost:0,   desc:'No protection.' },
+  leather: { id:'leather', name:'Leather Jerkin',def:4,  cost:40,  desc:'+4 defence' },
+  mail:    { id:'mail',    name:'Chain Mail',    def:9,  cost:130, desc:'+9 defence' },
+  plate:   { id:'plate',   name:'Steel Plate',   def:15, cost:320, desc:'+15 defence' },
+};
+
+// overworld encounter difficulty by tile type — west is gentle, east is deadly
+export const REGION_SCALE = {
+  grass: 0.7, plains: 0.8, forest: 0.95, woods: 1.05, cliff: 1.2, badlands: 1.45, cave: 1.45,
 };
 
 // region encounter pools keyed by tile type
 export const REGION_POOLS = {
-  grass:    ['toad', 'serpent', 'wolf', 'swan'],
-  plains:   ['toad', 'serpent', 'wolf', 'swan'],
-  forest:   ['wolf', 'bear', 'salamander', 'harpy', 'stag', 'boar'],
-  woods:    ['wolf', 'bear', 'salamander', 'harpy', 'stag', 'boar'],
-  cliff:    ['harpy', 'stag', 'wolf', 'boar'],
+  grass:    ['dove', 'fish', 'toad', 'tortoise'],          // gentle starting country
+  plains:   ['toad', 'serpent', 'tortoise', 'swan'],
+  forest:   ['wolf', 'stag', 'boar', 'peacock'],
+  woods:    ['wolf', 'bear', 'eagle', 'peacock', 'salamander'],
+  cliff:    ['eagle', 'harpy', 'horse', 'stag'],
   cave:     ['lion', 'wlion', 'salamander', 'ouroboros'],
-  badlands: ['lion', 'wlion', 'wyrm', 'ouroboros', 'harpy', 'boar'],
+  badlands: ['lion', 'wlion', 'horse', 'wyrm', 'ouroboros'],
 };
 
 // ---- Spells -----------------------------------------------------------------
@@ -118,8 +146,8 @@ export function recomputeStats(hero) {
   if (cls.passiveKey === 'opus') maxMp += (hero.level - 1) * 2;
   hero.maxHp = maxHp;
   hero.maxMp = maxMp;
-  hero.atk = s.atk + (cls.mods.atk || 0);
-  hero.def = s.def + (cls.mods.def || 0);
+  hero.atk = s.atk + (cls.mods.atk || 0) + (WEAPONS[hero.weapon] ? WEAPONS[hero.weapon].atk : 0);
+  hero.def = s.def + (cls.mods.def || 0) + (ARMOR[hero.armor] ? ARMOR[hero.armor].def : 0);
 }
 
 // ---- Playable characters (the human figures from the emblems) ---------------
@@ -277,15 +305,25 @@ export function stageForFloor(f) {
   return STAGES.find(s => f >= s.floors[0] && f <= s.floors[1]) || STAGES[STAGES.length - 1];
 }
 
+// decent starting weapon + armour per class (so the first fight is survivable)
+const START_GEAR = {
+  knight:     { weapon: 'sword',  armor: 'mail' },
+  alchemist:  { weapon: 'dagger', armor: 'leather' },
+  atalanta:   { weapon: 'dagger', armor: 'leather' },
+  hippomenes: { weapon: 'sword',  armor: 'leather' },
+};
+
 // starting hero for a chosen class
 export function newHero(classId = 'knight') {
   const cls = CLASS_BY_ID[classId] || CLASSES[0];
+  const gear = START_GEAR[cls.id] || { weapon: 'dagger', armor: 'leather' };
   const hero = {
     name: cls.name.replace(/^The /, ''),
     classId: cls.id, sprite: cls.sprite, passiveKey: cls.passiveKey,
     level: 1, xp: 0,
     hp: 1, maxHp: 1, mp: 0, maxMp: 0, atk: 1, def: 1,
-    gold: 0,
+    weapon: gear.weapon, armor: gear.armor,
+    gold: 30,
     items: { ...cls.items },
     spells: [...new Set([...spellsForLevel(1), ...cls.spells])],
     // overworld position (grid) — open ground just east of the Sun-Castle

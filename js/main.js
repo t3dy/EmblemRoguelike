@@ -109,9 +109,9 @@ class Game {
     this.startDungeon(next, changed);
   }
 
-  startBattle(monsterId) {                 // overworld wild encounter
+  startBattle(monsterId, scale = 1) {       // overworld wild encounter
     this._dungeonEnemy = null;
-    this.battle = new Battle(this, monsterId);
+    this.battle = new Battle(this, monsterId, scale);
     this.state = 'battle';
     this.audio.play('encounter');
   }

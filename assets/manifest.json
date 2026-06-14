@@ -313,5 +313,113 @@
     "w": 59,
     "h": 130,
     "src": "assets/extracted_all/stolcius_plate_044/individual/woman_queen_transparent.png"
+  },
+  {
+    "name": "m_tortoise",
+    "kind": "monster",
+    "label": "Stone Tortoise",
+    "file": "assets/sprites/m_tortoise.png",
+    "w": 190,
+    "h": 91,
+    "src": "assets/extracted_all/stolcius_plate_001/individual/tortoise_transparent.png"
+  },
+  {
+    "name": "m_horse",
+    "kind": "monster",
+    "label": "Night-Mare",
+    "file": "assets/sprites/m_horse.png",
+    "w": 220,
+    "h": 230,
+    "src": "assets/extracted_all/splendor_solis_local_p0022/individual/horse_transparent.png"
+  },
+  {
+    "name": "m_peacock",
+    "kind": "monster",
+    "label": "Cauda Pavonis",
+    "file": "assets/sprites/m_peacock.png",
+    "w": 220,
+    "h": 163,
+    "src": "assets/extracted_all/khunrath_p0197/individual/peacock_transparent.png"
+  },
+  {
+    "name": "m_dove",
+    "kind": "monster",
+    "label": "White Dove",
+    "file": "assets/sprites/m_dove.png",
+    "w": 124,
+    "h": 170,
+    "src": "assets/extracted_all/splendor_solis_ia_p0048/individual/bird_dove_transparent.png"
+  },
+  {
+    "name": "m_eagle",
+    "kind": "monster",
+    "label": "Eagle",
+    "file": "assets/sprites/m_eagle.png",
+    "w": 220,
+    "h": 138,
+    "src": "assets/extracted_all/stolcius_plate_032/individual/eagle_peacock_transparent.png"
+  },
+  {
+    "name": "m_fish",
+    "kind": "monster",
+    "label": "River Fish",
+    "file": "assets/sprites/m_fish.png",
+    "w": 200,
+    "h": 83,
+    "src": "assets/extracted_all/emblem-22/individual/fish_transparent.png"
+  },
+  {
+    "name": "s_house",
+    "kind": "structure",
+    "label": "Cottage",
+    "file": "assets/sprites/s_house.png",
+    "w": 130,
+    "h": 109,
+    "src": "assets/extracted_all/cramer_page_0045/individual/building_house_transparent.png"
+  },
+  {
+    "name": "s_church",
+    "kind": "structure",
+    "label": "Chapel",
+    "file": "assets/sprites/s_church.png",
+    "w": 160,
+    "h": 119,
+    "src": "assets/extracted_all/stolcius_plate_094/individual/castle_building_temp_transparent.png"
+  },
+  {
+    "name": "s_furnace",
+    "kind": "structure",
+    "label": "Athanor",
+    "file": "assets/sprites/s_furnace.png",
+    "w": 120,
+    "h": 106,
+    "src": "assets/extracted_all/stolcius_plate_059/individual/furnace_door_transparent.png"
+  },
+  {
+    "name": "s_altar",
+    "kind": "structure",
+    "label": "Shrine",
+    "file": "assets/sprites/s_altar.png",
+    "w": 120,
+    "h": 50,
+    "src": "assets/extracted_all/emblem-08/individual/altar_transparent.png"
+  },
+  {
+    "name": "t_water",
+    "kind": "terrain",
+    "label": "River",
+    "file": "assets/sprites/t_water.png",
+    "w": 130,
+    "h": 76,
+    "src": "assets/extracted_all/mclean_second_p0037/individual/river_sea_transparent.png"
+  },
+  {
+    "name": "t_garden",
+    "kind": "terrain",
+    "label": "Garden",
+    "file": "assets/sprites/t_garden.png",
+    "w": 110,
+    "h": 107,
+    "src": "assets/extracted_all/maier_arcana_p0071/individual/flower_transparent.png"
   }
 ]

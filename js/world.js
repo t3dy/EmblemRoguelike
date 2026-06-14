@@ -1,5 +1,5 @@
 // world.js — isometric overworld: render, hero movement, encounters, landmarks.
-import { MAP, MAP_LEGEND, BLOCKED, NO_ENCOUNTER, REGION_POOLS, MONSTERS } from './data.js';
+import { MAP, MAP_LEGEND, BLOCKED, NO_ENCOUNTER, REGION_POOLS, REGION_SCALE, MONSTERS } from './data.js';
 import { Assets } from './assets.js';
 
 const TILE_W = 64, TILE_H = 32;          // diamond tile footprint
@@ -108,7 +108,8 @@ export class World {
         this.stepsToEnc = this._rollSteps();
         const pool = REGION_POOLS[tt] || REGION_POOLS.grass;
         const id = pool[Math.floor(Math.random() * pool.length)];
-        this.game.startBattle(id);
+        const scale = REGION_SCALE[tt] || 1;
+        this.game.startBattle(id, scale);
       }
     }
   }
