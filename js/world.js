@@ -120,6 +120,11 @@ export class World {
         if ((tt === 'forest' || tt === 'woods') && Math.random() < 0.16 && this.game.faerieMentor) {
           this.game.faerieMentor(); return;
         }
+        // the wandering adept haunts the desperate wastes (one offer per game)
+        if ((tt === 'badlands' || tt === 'cave') && !this.hero.flags.adeptSeen &&
+            Math.random() < 0.25 && this.game.adeptEncounter) {
+          this.hero.flags.adeptSeen = true; this.game.adeptEncounter(); return;
+        }
         const pool = REGION_POOLS[tt] || REGION_POOLS.grass;
         const id = pool[Math.floor(Math.random() * pool.length)];
         const scale = REGION_SCALE[tt] || 1;

@@ -251,6 +251,20 @@ export const CLASSES = [
     items: { herb: 2, apple: 2 }, spells: [],
     passive: 'Caduceus: flees any non-boss; 10% of damage becomes gold.', passiveKey: 'caduceus',
   },
+  {
+    id: 'physician', name: 'The Physician', sprite: 'c_alchemist',
+    blurb: 'A Paracelsian healer who learned from miners and midwives, not books.',
+    mods: { maxHp: -4, atk: -1, def: 0, maxMp: +8 },
+    items: { herb: 2, theriac: 2 }, spells: ['HEAL'],
+    passive: 'Spagyrist: healing spells & medicines restore +50%.', passiveKey: 'physician',
+  },
+  {
+    id: 'warrioralch', name: 'Warrior-Alchemist', sprite: 'king',
+    blurb: 'Sword and crucible both — a martial adept who fights and conjures fire.',
+    mods: { maxHp: +6, atk: +2, def: +1, maxMp: +2 },
+    items: { herb: 3, potion: 1 }, spells: ['BLAZE'],
+    passive: 'Crucible: +25% spell damage.', passiveKey: 'crucible',
+  },
 ];
 export const CLASS_BY_ID = Object.fromEntries(CLASSES.map(c => [c.id, c]));
 
@@ -438,6 +452,8 @@ const START_GEAR = {
   soror:      { weapon: 'dagger', armor: 'whiterobe' },
   senex:      { weapon: 'sword',  armor: 'mail' },
   hermes:     { weapon: 'dagger', armor: 'leather' },
+  physician:  { weapon: 'dagger', armor: 'whiterobe' },
+  warrioralch:{ weapon: 'sword',  armor: 'mail' },
 };
 
 // starting hero for a chosen class

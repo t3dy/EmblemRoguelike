@@ -32,6 +32,7 @@ class Game {
     this.attribs = { might: 0, ward: 0, vigor: 0, spirit: 0 };
     this.attribSel = 0;
     this.pause = null;            // { sel } when the pause menu overlay is open
+    this.choice = null;           // { title, lines, options:[{label,fn}], sel } overlay
     this.titleT = 0;
     this.deathDepth = 0;
     this.questOffer = null;      // { who, quest } when a King/Queen is consulted
@@ -319,6 +320,36 @@ class Game {
       line
     ], () => { apply(); this.save(); });
   }
+  // The wandering adept (Moritz) — an ethics fork (Zuber, *Ambix*). Fund him
+  // fairly for a loyal boon, or exploit him cheaply and bear his curse.
+  adeptEncounter() {
+    const h = this.hero;
+    this.openChoice(
+      'A RAGGED ADEPT',
+      ['A starving foreign adept offers his secret process for coin.',
+       '"Whenever I asked for bread, they sucked the blood from my heart…"'],
+      [
+        { label: 'Pay him fairly (60 gold) — gain a loyal craftsman', fn: () => {
+          if (h.gold < 60) { this.dialog(['You have not 60 gold. The adept turns away, despairing.']); return; }
+          h.gold -= 60; h.flags.adeptAlly = true;
+          h.attribs.spirit = (h.attribs.spirit || 0) + 1; recomputeStats(h);
+          h.items.greekfire = (h.items.greekfire || 0) + 2;
+          this.dialog(['ADEPT: You are honest! Take my true process — and my loyalty.',
+            'Gained +1 Spirit and 2 Greek Fire. (A loyal crafter remembers.)'], () => this.save());
+        } },
+        { label: 'Haggle him down (20 gold) — cheap, but he curses you', fn: () => {
+          if (h.gold < 20) { this.dialog(['You have not even 20 gold. The adept spits and shuffles off.']); return; }
+          h.gold -= 20; h.flags.adeptWronged = true;
+          h.items.greekfire = (h.items.greekfire || 0) + 1;
+          const loss = 4; h.maxHp = Math.max(10, h.maxHp - loss); h.hp = Math.min(h.hp, h.maxHp);
+          this.audio.play('lose');
+          this.dialog(['ADEPT: A pittance! Then take it — and my curse upon your house.',
+            `Gained 1 Greek Fire, but his curse saps your vigour (−${loss} max HP).`], () => this.save());
+        } },
+        { label: 'Refuse and walk on', fn: () => { this.dialog(['You leave the adept to his laborynthory of woes.']); } },
+      ]
+    );
+  }
   enterTown() {
     this.town = new Town(this, 'Village of Mercurius');
     this.state = 'town';
@@ -413,7 +444,26 @@ class Game {
     }
   }
 
+  // ---- generic two-or-three way choice overlay (NPC decisions) ----
+  openChoice(title, lines, options) {
+    this.input = { up: false, down: false, left: false, right: false };
+    this.choice = { title, lines, options, sel: 0 };
+    this.audio.play('magic');
+  }
+  _pressChoice(k) {
+    const c = this.choice;
+    if (k === 'up') c.sel = (c.sel - 1 + c.options.length) % c.options.length;
+    else if (k === 'down') c.sel = (c.sel + 1) % c.options.length;
+    else if (k === 'confirm') {
+      const opt = c.options[c.sel];
+      this.choice = null;
+      if (opt && opt.fn) opt.fn();
+    }
+  }
+
   _press(k) {
+    // overlays intercept all input while open
+    if (this.choice) { this._pressChoice(k); return; }
     // the pause overlay intercepts all input while open
     if (this.pause) { this._pressPause(k); return; }
     // open the pause menu from any in-play state
@@ -528,6 +578,27 @@ class Game {
       this.battle.render(ctx);
     }
     if (this.pause) this._renderPause(ctx);
+    if (this.choice) this._renderChoice(ctx);
+  }
+
+  _renderChoice(ctx) {
+    const c = this.choice;
+    ctx.fillStyle = 'rgba(8,6,14,0.74)'; ctx.fillRect(0, 0, this.W, this.H);
+    const pw = 540, ph = 150 + c.lines.length * 22 + c.options.length * 30;
+    const px = this.W / 2 - pw / 2, py = this.H / 2 - ph / 2;
+    parchmentCard(ctx, px, py, pw, ph);
+    text(ctx, c.title, this.W / 2, py + 18, { align: 'center', size: 18, color: '#7a2010', shadow: false });
+    let yy = py + 52;
+    c.lines.forEach(ln => { yy = this._wrapInk(ctx, ln, px + 28, yy, pw - 56, 18) + 4; });
+    yy += 6;
+    c.options.forEach((o, i) => {
+      const sel = i === c.sel;
+      if (sel) text(ctx, '▶', px + 30, yy, { size: 15, color: '#7a2010', shadow: false });
+      text(ctx, o.label, px + 52, yy, { size: 15, color: sel ? '#7a2010' : '#3a2a18', shadow: false });
+      yy += 30;
+    });
+    if (Math.floor(this.titleT * 1.5) % 2 === 0)
+      text(ctx, '↑↓ choose   •   Z confirm', this.W / 2, py + ph - 18, { align: 'center', size: 12, color: '#5b4226', shadow: false });
   }
 
   _renderPause(ctx) {

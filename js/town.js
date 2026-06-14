@@ -11,6 +11,7 @@ const ROOT_MENU = [
   { id: 'armoury',   label: 'Armoury (weapons & armour)' },
   { id: 'bookstore', label: 'Bookstore (tomes of the Art)' },
   { id: 'assayer',   label: "Assayer (sell relics for gold)" },
+  { id: 'sage',      label: 'Albertus the Sage (temper thy gear)' },
   { id: 'leave',     label: 'Leave town' },
 ];
 
@@ -72,6 +73,27 @@ export class Town {
     if (id === 'inn') {
       h.hp = h.maxHp; h.mp = h.maxMp; this.game.sfx('heal');
       this.game.msg.push('You rest the night at the inn. HP and MP restored.');
+      return;
+    }
+    if (id === 'sage') {
+      // Albertus Magnus — the cautious assay-mentor. The fire-test tempers gear:
+      // each successful tempering adds +1 Might (Attack), at escalating cost.
+      h.flags = h.flags || {};
+      const n = h.flags.tempered || 0;
+      const cost = 60 * (n + 1);
+      if (!h.flags.metAlbertus) {
+        h.flags.metAlbertus = true;
+        this.game.msg.push('ALBERTUS: True gold endures the fire; counterfeit turns to dross.',
+          'ALBERTUS: Bring me coin and I shall temper thy steel by the fire-test.');
+        return;
+      }
+      if (h.gold < cost) { this.game.sfx('hit'); this.game.msg.push(`The fire-test costs ${cost} gold. Thou hast not enough.`); return; }
+      h.gold -= cost; h.flags.tempered = n + 1;
+      h.attribs = h.attribs || { might: 0, ward: 0, vigor: 0, spirit: 0 };
+      h.attribs.might = (h.attribs.might || 0) + 1; recomputeStats(h);
+      this.game.sfx('level');
+      this.game.msg.push('Albertus tempers thy weapon in the athanor.', `It survives the examen — Attack is now ${h.atk}.`);
+      this.game.save();
       return;
     }
     if (id === 'apothecary') {

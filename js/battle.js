@@ -166,31 +166,37 @@ export class Battle {
     this.pendingResolve = () => this._afterHeroAction();
   }
 
+  // passive multipliers: Physician boosts healing, Warrior-Alchemist boosts spells
+  _healMul() { return this.hero.passiveKey === 'physician' ? 1.5 : 1; }
+  _spellMul() { return this.hero.passiveKey === 'crucible' ? 1.25 : 1; }
+
   _castSpell(key) {
     const sp = SPELLS[key];
     if (this.hero.mp < sp.cost) { this.phase = PHASE.MENU; this.game.msg.push('Not enough MP!'); return; }
     this.hero.mp -= sp.cost;
     this.phase = PHASE.ANIM;
     if (sp.type === 'heal') {
-      const amt = sp.power + Math.floor(Math.random() * 8);
+      const amt = Math.round((sp.power + Math.floor(Math.random() * 8)) * this._healMul());
       this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + amt);
       this.game.sfx('heal');
       this.game.msg.push(`${this.hero.name} casts ${sp.name}!`, `HP restored by ${amt}.`);
       this.pendingResolve = () => this._afterHeroAction(false);
     } else if (sp.type === 'cleanse') {
       this.heroSt = []; this._addSt('hero', 'whiten', 3);
-      this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + sp.power);
+      this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + Math.round(sp.power * this._healMul()));
       this.game.sfx('heal');
       this.game.msg.push(`${this.hero.name} casts ${sp.name}!`, `Curses washed away; the whitening sustains.`);
       this.pendingResolve = () => this._afterHeroAction(false);
     } else if (sp.type === 'curse') {
       const d = this._dmg(sp.power, this._effDef('mon', this.mon.def));
+      d.value = Math.round(d.value * this._spellMul());
       this.mon.hp -= d.value; this._addSt('mon', 'blacken', 3); this.flash = 0.4;
       this.game.sfx('magic');
       this.game.msg.push(`${this.hero.name} casts ${sp.name}!`, `${this.mon.name} rots — ${d.value} damage and Blacken.`);
       this.pendingResolve = () => this._afterHeroAction();
     } else {
       const d = this._dmg(sp.power + 6, this.mon.def);
+      d.value = Math.round(d.value * this._spellMul());
       this.mon.hp -= d.value;
       this.flash = 0.4; this.shake = 0.35;
       this.game.sfx('magic');
@@ -204,7 +210,7 @@ export class Battle {
     this.hero.items[key]--;
     this.phase = PHASE.ANIM;
     if (it.type === 'heal') {
-      const amt = it.power + Math.floor(Math.random() * 8);
+      const amt = Math.round((it.power + Math.floor(Math.random() * 8)) * this._healMul());
       this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + amt);
       this.game.sfx('heal');
       this.game.msg.push(`Used ${it.name}.`, `HP restored by ${amt}.`);
@@ -221,7 +227,7 @@ export class Battle {
       this.game.msg.push(`Quaffed the ${it.name}!`, it.id === 'quinta' ? 'Fully restored; all curses cleansed.' : 'HP and MP fully restored.');
       this.pendingResolve = () => this._afterHeroAction(false);
     } else if (it.type === 'cure') {
-      const amt = it.power + Math.floor(Math.random() * 6);
+      const amt = Math.round((it.power + Math.floor(Math.random() * 6)) * this._healMul());
       this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + amt);
       this.heroSt = this.heroSt.filter(s => !['blacken', 'venom', 'coagulate', 'dissolve', 'tartar'].includes(s.key));
       this.game.sfx('heal');
