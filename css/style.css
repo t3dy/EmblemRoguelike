@@ -17,7 +17,8 @@ canvas#game {
   display: block;
   width: min(92vw, 768px);
   height: auto;
-  image-rendering: auto;
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
   filter: sepia(0.22) contrast(1.10) brightness(0.96);
 }
 #hint { font-size: 12px; color: #8d86a8; margin: 2px 0 0; text-align: center; }

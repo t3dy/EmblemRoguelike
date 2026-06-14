@@ -20,135 +20,169 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import validate_assets
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Game repo root (contains assets/, js/, index.html)
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Sibling repos that hold source imagery
+PRINTSHOP = os.path.join(ROOT, '..', 'EmblemPrintShop')
+CLAUDIENS  = os.path.join(ROOT, '..', 'Claudiens')
+
 os.chdir(ROOT)
-OUT = os.path.join('game', 'assets', 'sprites')
+OUT = os.path.join('assets', 'sprites')
 os.makedirs(OUT, exist_ok=True)
+
+def ps(path):
+    """Resolve a path relative to EmblemPrintShop."""
+    return os.path.normpath(os.path.join(PRINTSHOP, path))
+
+def cl(path):
+    """Resolve a path relative to the Claudiens repo."""
+    return os.path.normpath(os.path.join(CLAUDIENS, path))
 
 # role: where the sprite is used. kind: hero|npc|monster|structure|terrain|decor
 # crop: (x0,y0,x1,y1) in source px, or None for whole image
 # bg: 'paper' removes bright background; 'alpha' trusts existing alpha; 'keep' no removal
 # size: longest-edge target px
+def _e(plate, tag):
+    """Path to an extracted individual from EmblemPrintShop."""
+    return ps(f'assets/extracted_all/{plate}/individual/{tag}_transparent.png')
+
+def _af(emblem):
+    """Path to an Atalanta Fugiens plate from Claudiens."""
+    return cl(f'site/images/emblems/emblem-{emblem:02d}.jpg')
+
 MANIFEST = [
  # --- HERO + NPCs (woodcut single figures) ---
  dict(name='hero',    kind='hero',   label='The Knight',
-      src=r'assets\extracted_all\stolcius_plate_013\individual\person_transparent.png',
+      src=_e('stolcius_plate_013', 'person'),
       bg='paper', size=96),
  dict(name='king',    kind='npc',    label='King of the Sun-Castle',
-      src=r'assets\extracted_all\stolcius_plate_033\individual\man_old_man_transparent.png',
+      src=_e('stolcius_plate_033', 'man_old_man'),
       bg='paper', size=96),
  dict(name='sage',    kind='npc',    label='The Sage',
-      src=r'assets\extracted_all\stolcius_plate_047\individual\man_old_man_transparent.png',
+      src=_e('stolcius_plate_047', 'man_old_man'),
       bg='paper', size=96),
  dict(name='villager',kind='npc',    label='Villager',
-      src=r'assets\extracted_all\stolcius_plate_023\individual\man_old_man_transparent.png',
+      src=_e('stolcius_plate_023', 'man_old_man'),
       bg='paper', size=96),
 
  # --- MONSTERS ---
  dict(name='m_dragon', kind='monster', label='The Alchemical Dragon',
-      src=r'sources\claudiens\site\images\emblems\emblem-25.jpg',
-      crop=(470, 600, 1010, 1290), bg='paper', size=320),
- dict(name='m_wlion',  kind='monster', label='Winged Lion',
-      src=r'assets\extracted_all\stolcius_plate_006\individual\dog_transparent.png',
+      src=_af(25), crop=(470, 600, 1010, 1290), bg='paper', size=480),
+ dict(name='m_wlion',  kind='monster', label='Hound of the Furnace',
+      src=_e('stolcius_plate_006', 'dog'),
       bg='paper', size=260),
  dict(name='m_bear',   kind='monster', label='Forest Bear',
-      src=r'assets\extracted_all\emblem-24\individual\bear_ox_frog_transparent.png',
+      src=_e('emblem-24', 'bear_ox_frog'),
       bg='paper', size=260),
  dict(name='m_wolf',   kind='monster', label='Grey Wolf',
-      src=r'assets\extracted_all\stolcius_plate_078\individual\wolf_frog_transparent.png',
+      src=_e('stolcius_plate_078', 'wolf_frog'),
       bg='paper', size=240),
- dict(name='m_salamander', kind='monster', label='Salamander',
-      src=r'assets\extracted_all\splendor_solis_local_p0008\individual\wolf_frog_fox_transparent.png',
-      bg='alpha', size=220),
+ dict(name='m_salamander', kind='monster', label='Red Fox Familiar',
+      src=_e('splendor_solis_local_p0008', 'wolf_frog_fox'),
+      bg='alpha', size=340),
  dict(name='m_harpy',  kind='monster', label='Harpy',
-      src=r'assets\extracted_all\splendor_solis_ia_p0054\individual\eagle_bird_butterfly_transparent.png',
-      bg='alpha', size=220),
+      src=_e('splendor_solis_ia_p0054', 'eagle_bird_butterfly'),
+      bg='alpha', size=340),
  dict(name='m_toad',   kind='monster', label='Venom Toad',
-      src=r'assets\extracted_all\stolcius_plate_017\individual\frog_transparent.png',
+      src=_e('stolcius_plate_017', 'frog'),
       bg='paper', size=200),
  dict(name='m_serpent',kind='monster', label='River Serpent',
-      src=r'assets\extracted_all\stolcius_plate_054\individual\eagle_serpent_transparent.png',
+      src=_e('stolcius_plate_054', 'eagle_serpent'),
       bg='paper', size=220),
- # --- new dragons (hand-cropped from Atalanta Fugiens plates) ---
+ # --- dragons (hand-cropped from Atalanta Fugiens plates) ---
  dict(name='m_ouroboros', kind='monster', label='Ouroboros Wyrm',
-      src=r'sources\claudiens\site\images\emblems\emblem-14.jpg',
-      crop=(150, 520, 1230, 1230), bg='paper', size=320),
+      src=_af(14), crop=(150, 520, 1230, 1230), bg='paper', size=480),
  dict(name='m_wyrm', kind='monster', label='Coiling Wyrm',
-      src=r'sources\claudiens\site\images\emblems\emblem-50.jpg',
-      crop=(470, 420, 1090, 1200), bg='paper', size=300),
- # --- the lion + more alchemical beasts ---
- dict(name='m_lion', kind='monster', label='The Lion',
-      src=r'assets\extracted_all\stolcius_plate_013\individual\dog_transparent.png',
+      src=_af(50), crop=(470, 420, 1090, 1200), bg='paper', size=450),
+ # --- alchemical beasts ---
+ dict(name='m_lion', kind='monster', label='The Alchemical Hound',
+      src=_e('stolcius_plate_013', 'dog'),
       bg='paper', size=240),
  dict(name='m_stag', kind='monster', label='White Stag',
-      src=r'assets\extracted_all\splendor_solis_ia_p0019\individual\deer_transparent.png',
-      bg='alpha', size=220),
+      src=_e('splendor_solis_ia_p0019', 'deer'),
+      bg='alpha', size=340),
  dict(name='m_boar', kind='monster', label='Wild Boar',
-      src=r'sources\claudiens\site\images\emblems\emblem-41.jpg',
-      crop=(1085, 465, 1490, 690), bg='paper', size=220),
+      src=_af(41), crop=(1085, 465, 1490, 690), bg='paper', size=320),
  dict(name='m_swan', kind='monster', label='Black Swan',
-      src=r'assets\extracted_all\mclean_second_p0042\individual\bird_transparent.png',
+      src=_e('mclean_second_p0042', 'bird'),
       bg='alpha', size=200),
+ dict(name='m_tortoise', kind='monster', label='Stone Tortoise',
+      src=_e('stolcius_plate_001', 'tortoise'),
+      bg='paper', size=260),
+ dict(name='m_horse', kind='monster', label='Night-Mare',
+      src=_e('splendor_solis_local_p0022', 'horse'),
+      bg='alpha', size=280),
+ dict(name='m_peacock', kind='monster', label='Cauda Pavonis',
+      src=_e('khunrath_p0197', 'peacock'),
+      bg='paper', size=300),
+ dict(name='m_dove', kind='monster', label='White Dove',
+      src=_e('splendor_solis_ia_p0048', 'bird_dove'),
+      bg='alpha', size=260),
+ dict(name='m_eagle', kind='monster', label='Eagle',
+      src=_e('stolcius_plate_032', 'eagle_peacock'),
+      bg='paper', size=260),
+ dict(name='m_fish', kind='monster', label='River Fish',
+      src=_e('emblem-22', 'fish'),
+      bg='paper', size=260),
 
  # --- STRUCTURES (overworld landmarks) ---
  dict(name='s_castle', kind='structure', label='Sun-Castle',
-      src=r'assets\extracted_all\stolcius_plate_002\individual\castle_transparent.png',
+      src=_e('stolcius_plate_002', 'castle'),
       bg='paper', size=160),
  dict(name='s_tower',  kind='structure', label='Watchtower',
-      src=r'assets\extracted_all\cramer_page_0077\individual\tower_transparent.png',
+      src=_e('cramer_page_0077', 'tower'),
       bg='paper', size=140),
  dict(name='s_town',   kind='structure', label='Village',
-      src=r'assets\extracted_all\emblem-28\individual\tower_chimney_transparent.png',
+      src=_e('emblem-28', 'tower_chimney'),
       bg='paper', size=150),
  dict(name='s_gate',   kind='structure', label='Stone Bridge',
-      src=r'assets\extracted_all\mclean_second_p0050\individual\gate_bridge_transparent.png',
+      src=_e('mclean_second_p0050', 'gate_bridge'),
       bg='paper', size=150),
  dict(name='s_door',   kind='structure', label='Dungeon Door',
-      src=r'assets\extracted_all\emblem-08\individual\door_transparent.png',
+      src=_e('emblem-08', 'door'),
       bg='paper', size=120),
 
  # --- TERRAIN DECOR ---
  dict(name='t_forest', kind='terrain', label='Forest',
-      src=r'assets\extracted_all\stolcius_plate_031\individual\forest_transparent.png',
+      src=_e('stolcius_plate_031', 'forest'),
       bg='paper', size=110),
  dict(name='t_mountain',kind='terrain', label='Mountain',
-      src=r'assets\extracted_all\stolcius_plate_005\individual\mountain_hill_transparent.png',
+      src=_e('stolcius_plate_005', 'mountain_hill'),
       bg='paper', size=120),
  dict(name='t_mountain2',kind='terrain', label='Peaks',
-      src=r'assets\extracted_all\emblem-46\individual\mountain_hill_transparent.png',
+      src=_e('emblem-46', 'mountain_hill'),
       bg='paper', size=130),
  dict(name='t_cave',   kind='terrain', label='Cave',
-      src=r'assets\extracted_all\mclean_second_p0056\individual\cave_transparent.png',
+      src=_e('mclean_second_p0056', 'cave'),
       bg='paper', size=120),
  dict(name='t_cliff',  kind='terrain', label='Cliff',
-      src=r'assets\extracted_all\maier_arcana_p0180\individual\cliff_transparent.png',
+      src=_e('maier_arcana_p0180', 'cliff'),
       bg='paper', size=120),
  dict(name='t_forest2',kind='terrain', label='Woods',
-      src=r'assets\extracted_all\stolcius_plate_061\individual\forest_transparent.png',
+      src=_e('stolcius_plate_061', 'forest'),
       bg='paper', size=110),
 
  # --- DECOR (title screen) ---
  dict(name='d_sun',   kind='decor', label='Sol',
-      src=r'assets\extracted_all\emblem-45\individual\sun_transparent.png',
+      src=_e('emblem-45', 'sun'),
       bg='paper', size=200),
 
  # --- PLAYER CLASSES (character select) ---
  dict(name='c_alchemist', kind='hero', label='The Alchemist',
-      src=r'sources\claudiens\site\images\emblems\emblem-21.jpg',
-      crop=(32, 150, 544, 1421), bg='paper', size=110),
+      src=_af(21), crop=(32, 150, 544, 1421), bg='paper', size=200),
  dict(name='c_atalanta',  kind='hero', label='Atalanta',
-      src=r'assets\extracted_all\stolcius_plate_002\individual\woman_transparent.png',
+      src=_e('stolcius_plate_002', 'woman'),
       bg='paper', size=110),
  dict(name='c_hippomenes',kind='hero', label='Hippomenes',
-      src=r'assets\extracted_all\splendor_solis_ia_p0038\individual\person_transparent.png',
+      src=_e('splendor_solis_ia_p0038', 'person'),
       bg='alpha', size=110),
 
  # --- QUEST GIVERS (Sol & Luna) ---
  dict(name='q_king',  kind='npc', label='The King (Sol)',
-      src=r'assets\extracted_all\stolcius_plate_033\individual\man_old_man_transparent.png',
+      src=_e('stolcius_plate_033', 'man_old_man'),
       bg='paper', size=130),
  dict(name='q_queen', kind='npc', label='The Queen (Luna)',
-      src=r'assets\extracted_all\stolcius_plate_044\individual\woman_queen_transparent.png',
+      src=_e('stolcius_plate_044', 'woman_queen'),
       bg='paper', size=130),
 ]
 
@@ -206,7 +240,7 @@ def process(entry):
     scale = size / max(im.width, im.height)
     nw, nh = max(1, round(im.width*scale)), max(1, round(im.height*scale))
     im = im.resize((nw, nh), Image.LANCZOS)
-    im = posterize_rgb(im, bits=4)
+    im = posterize_rgb(im, bits=6)
     out_path = os.path.join(OUT, entry['name'] + '.png')
     im.save(out_path)
     return im, out_path
@@ -230,7 +264,7 @@ def main():
         manifest_out.append(rec)
         print(f"ok {e['name']:12s} {im.width}x{im.height}")
 
-    with open(os.path.join('game', 'assets', 'manifest.json'), 'w', encoding='utf-8') as f:
+    with open(os.path.join('assets', 'manifest.json'), 'w', encoding='utf-8') as f:
         json.dump(manifest_out, f, indent=2)
 
     # review sheet on a dark battle-like bg
@@ -244,7 +278,7 @@ def main():
         cx, cy = (i % cols)*cell, (i//cols)*cell
         sheet.alpha_composite(thumb, (cx + (cell-thumb.width)//2, cy + 8))
         dr.text((cx+6, cy+cell-22), f"{e['name']} [{e['kind']}]", fill=(255, 230, 150, 255))
-    sheet.convert('RGB').save(os.path.join(OUT, '_SHEET.png'))
+    sheet.convert('RGB').save(os.path.join('assets', 'sprites', '_SHEET.png'))
     print('\nwrote', len(manifest_out), 'sprites + manifest + _SHEET.png')
 
     # --- post-build verification -------------------------------------------

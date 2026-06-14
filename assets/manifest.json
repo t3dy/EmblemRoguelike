@@ -6,7 +6,7 @@
     "file": "assets/sprites/hero.png",
     "w": 51,
     "h": 96,
-    "src": "assets/extracted_all/stolcius_plate_013/individual/person_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_013/individual/person_transparent.png"
   },
   {
     "name": "king",
@@ -15,7 +15,7 @@
     "file": "assets/sprites/king.png",
     "w": 45,
     "h": 96,
-    "src": "assets/extracted_all/stolcius_plate_033/individual/man_old_man_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_033/individual/man_old_man_transparent.png"
   },
   {
     "name": "sage",
@@ -24,7 +24,7 @@
     "file": "assets/sprites/sage.png",
     "w": 53,
     "h": 96,
-    "src": "assets/extracted_all/stolcius_plate_047/individual/man_old_man_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_047/individual/man_old_man_transparent.png"
   },
   {
     "name": "villager",
@@ -33,16 +33,16 @@
     "file": "assets/sprites/villager.png",
     "w": 49,
     "h": 96,
-    "src": "assets/extracted_all/stolcius_plate_023/individual/man_old_man_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_023/individual/man_old_man_transparent.png"
   },
   {
     "name": "m_dragon",
     "kind": "monster",
     "label": "The Alchemical Dragon",
     "file": "assets/sprites/m_dragon.png",
-    "w": 250,
-    "h": 320,
-    "src": "sources/claudiens/site/images/emblems/emblem-25.jpg"
+    "w": 376,
+    "h": 480,
+    "src": "C:/Dev/Claudiens/site/images/emblems/emblem-25.jpg"
   },
   {
     "name": "m_wlion",
@@ -51,7 +51,7 @@
     "file": "assets/sprites/m_wlion.png",
     "w": 260,
     "h": 240,
-    "src": "assets/extracted_all/stolcius_plate_006/individual/dog_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_006/individual/dog_transparent.png"
   },
   {
     "name": "m_bear",
@@ -60,7 +60,7 @@
     "file": "assets/sprites/m_bear.png",
     "w": 260,
     "h": 143,
-    "src": "assets/extracted_all/emblem-24/individual/bear_ox_frog_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/emblem-24/individual/bear_ox_frog_transparent.png"
   },
   {
     "name": "m_wolf",
@@ -69,25 +69,25 @@
     "file": "assets/sprites/m_wolf.png",
     "w": 240,
     "h": 179,
-    "src": "assets/extracted_all/stolcius_plate_078/individual/wolf_frog_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_078/individual/wolf_frog_transparent.png"
   },
   {
     "name": "m_salamander",
     "kind": "monster",
     "label": "Red Fox Familiar",
     "file": "assets/sprites/m_salamander.png",
-    "w": 207,
-    "h": 220,
-    "src": "assets/extracted_all/splendor_solis_local_p0008/individual/wolf_frog_fox_transparent.png"
+    "w": 319,
+    "h": 340,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/splendor_solis_local_p0008/individual/wolf_frog_fox_transparent.png"
   },
   {
     "name": "m_harpy",
     "kind": "monster",
     "label": "Harpy",
     "file": "assets/sprites/m_harpy.png",
-    "w": 220,
-    "h": 174,
-    "src": "assets/extracted_all/splendor_solis_ia_p0054/individual/eagle_bird_butterfly_transparent.png"
+    "w": 340,
+    "h": 268,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/splendor_solis_ia_p0054/individual/eagle_bird_butterfly_transparent.png"
   },
   {
     "name": "m_toad",
@@ -96,7 +96,7 @@
     "file": "assets/sprites/m_toad.png",
     "w": 200,
     "h": 183,
-    "src": "assets/extracted_all/stolcius_plate_017/individual/frog_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_017/individual/frog_transparent.png"
   },
   {
     "name": "m_serpent",
@@ -105,25 +105,25 @@
     "file": "assets/sprites/m_serpent.png",
     "w": 181,
     "h": 220,
-    "src": "assets/extracted_all/stolcius_plate_054/individual/eagle_serpent_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_054/individual/eagle_serpent_transparent.png"
   },
   {
     "name": "m_ouroboros",
     "kind": "monster",
     "label": "Ouroboros Wyrm",
     "file": "assets/sprites/m_ouroboros.png",
-    "w": 320,
-    "h": 210,
-    "src": "sources/claudiens/site/images/emblems/emblem-14.jpg"
+    "w": 480,
+    "h": 316,
+    "src": "C:/Dev/Claudiens/site/images/emblems/emblem-14.jpg"
   },
   {
     "name": "m_wyrm",
     "kind": "monster",
     "label": "Coiling Wyrm",
     "file": "assets/sprites/m_wyrm.png",
-    "w": 238,
-    "h": 300,
-    "src": "sources/claudiens/site/images/emblems/emblem-50.jpg"
+    "w": 358,
+    "h": 450,
+    "src": "C:/Dev/Claudiens/site/images/emblems/emblem-50.jpg"
   },
   {
     "name": "m_lion",
@@ -132,25 +132,25 @@
     "file": "assets/sprites/m_lion.png",
     "w": 240,
     "h": 233,
-    "src": "assets/extracted_all/stolcius_plate_013/individual/dog_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_013/individual/dog_transparent.png"
   },
   {
     "name": "m_stag",
     "kind": "monster",
     "label": "White Stag",
     "file": "assets/sprites/m_stag.png",
-    "w": 220,
-    "h": 180,
-    "src": "assets/extracted_all/splendor_solis_ia_p0019/individual/deer_transparent.png"
+    "w": 340,
+    "h": 278,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/splendor_solis_ia_p0019/individual/deer_transparent.png"
   },
   {
     "name": "m_boar",
     "kind": "monster",
     "label": "Wild Boar",
     "file": "assets/sprites/m_boar.png",
-    "w": 220,
-    "h": 122,
-    "src": "sources/claudiens/site/images/emblems/emblem-41.jpg"
+    "w": 320,
+    "h": 178,
+    "src": "C:/Dev/Claudiens/site/images/emblems/emblem-41.jpg"
   },
   {
     "name": "m_swan",
@@ -159,106 +159,160 @@
     "file": "assets/sprites/m_swan.png",
     "w": 200,
     "h": 140,
-    "src": "assets/extracted_all/mclean_second_p0042/individual/bird_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/mclean_second_p0042/individual/bird_transparent.png"
+  },
+  {
+    "name": "m_tortoise",
+    "kind": "monster",
+    "label": "Stone Tortoise",
+    "file": "assets/sprites/m_tortoise.png",
+    "w": 260,
+    "h": 125,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_001/individual/tortoise_transparent.png"
+  },
+  {
+    "name": "m_horse",
+    "kind": "monster",
+    "label": "Night-Mare",
+    "file": "assets/sprites/m_horse.png",
+    "w": 268,
+    "h": 280,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/splendor_solis_local_p0022/individual/horse_transparent.png"
+  },
+  {
+    "name": "m_peacock",
+    "kind": "monster",
+    "label": "Cauda Pavonis",
+    "file": "assets/sprites/m_peacock.png",
+    "w": 300,
+    "h": 222,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/khunrath_p0197/individual/peacock_transparent.png"
+  },
+  {
+    "name": "m_dove",
+    "kind": "monster",
+    "label": "White Dove",
+    "file": "assets/sprites/m_dove.png",
+    "w": 190,
+    "h": 260,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/splendor_solis_ia_p0048/individual/bird_dove_transparent.png"
+  },
+  {
+    "name": "m_eagle",
+    "kind": "monster",
+    "label": "Eagle",
+    "file": "assets/sprites/m_eagle.png",
+    "w": 260,
+    "h": 162,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_032/individual/eagle_peacock_transparent.png"
+  },
+  {
+    "name": "m_fish",
+    "kind": "monster",
+    "label": "River Fish",
+    "file": "assets/sprites/m_fish.png",
+    "w": 260,
+    "h": 109,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/emblem-22/individual/fish_transparent.png"
   },
   {
     "name": "s_castle",
     "kind": "structure",
     "label": "Sun-Castle",
     "file": "assets/sprites/s_castle.png",
-    "w": 45,
-    "h": 160,
-    "src": "assets/extracted_all/cramer_page_0097/individual/castle_transparent.png"
+    "w": 160,
+    "h": 115,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_002/individual/castle_transparent.png"
   },
   {
     "name": "s_tower",
     "kind": "structure",
     "label": "Watchtower",
     "file": "assets/sprites/s_tower.png",
-    "w": 53,
-    "h": 94,
-    "src": "assets/extracted_all/cramer_page_0077/individual/tower_transparent.png"
+    "w": 86,
+    "h": 140,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/cramer_page_0077/individual/tower_transparent.png"
   },
   {
     "name": "s_town",
     "kind": "structure",
     "label": "Village",
     "file": "assets/sprites/s_town.png",
-    "w": 160,
-    "h": 132,
-    "src": "assets/extracted_all/stolcius_plate_069/individual/building_house_transparent.png"
+    "w": 91,
+    "h": 150,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/emblem-28/individual/tower_chimney_transparent.png"
   },
   {
     "name": "s_gate",
     "kind": "structure",
     "label": "Stone Bridge",
     "file": "assets/sprites/s_gate.png",
-    "w": 128,
-    "h": 117,
-    "src": "assets/extracted_all/mclean_second_p0050/individual/gate_bridge_transparent.png"
+    "w": 150,
+    "h": 139,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/mclean_second_p0050/individual/gate_bridge_transparent.png"
   },
   {
     "name": "s_door",
     "kind": "structure",
     "label": "Dungeon Door",
     "file": "assets/sprites/s_door.png",
-    "w": 40,
-    "h": 160,
-    "src": "assets/extracted_all/emblem-08/individual/door_transparent.png"
+    "w": 32,
+    "h": 120,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/emblem-08/individual/door_transparent.png"
   },
   {
     "name": "t_forest",
     "kind": "terrain",
     "label": "Forest",
     "file": "assets/sprites/t_forest.png",
-    "w": 34,
-    "h": 128,
-    "src": "assets/extracted_all/stolcius_plate_076/individual/tree_transparent.png"
+    "w": 110,
+    "h": 43,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_031/individual/forest_transparent.png"
   },
   {
     "name": "t_mountain",
     "kind": "terrain",
     "label": "Mountain",
     "file": "assets/sprites/t_mountain.png",
-    "w": 128,
-    "h": 45,
-    "src": "assets/extracted_all/khunrath_p0026/individual/mountain_hill_transparent.png"
+    "w": 120,
+    "h": 76,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_005/individual/mountain_hill_transparent.png"
   },
   {
     "name": "t_mountain2",
     "kind": "terrain",
     "label": "Peaks",
     "file": "assets/sprites/t_mountain2.png",
-    "w": 127,
-    "h": 29,
-    "src": "assets/extracted_all/maier_arcana_p0180/individual/cliff_transparent.png"
+    "w": 130,
+    "h": 65,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/emblem-46/individual/mountain_hill_transparent.png"
   },
   {
     "name": "t_cave",
     "kind": "terrain",
     "label": "Cave",
     "file": "assets/sprites/t_cave.png",
-    "w": 62,
-    "h": 127,
-    "src": "assets/extracted_all/obrist_debuts_p0075/individual/cave_transparent.png"
+    "w": 108,
+    "h": 120,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/mclean_second_p0056/individual/cave_transparent.png"
   },
   {
     "name": "t_cliff",
     "kind": "terrain",
     "label": "Cliff",
     "file": "assets/sprites/t_cliff.png",
-    "w": 127,
-    "h": 29,
-    "src": "assets/extracted_all/maier_arcana_p0180/individual/cliff_transparent.png"
+    "w": 120,
+    "h": 30,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/maier_arcana_p0180/individual/cliff_transparent.png"
   },
   {
     "name": "t_forest2",
     "kind": "terrain",
     "label": "Woods",
     "file": "assets/sprites/t_forest2.png",
-    "w": 46,
-    "h": 128,
-    "src": "assets/extracted_all/rosarium_page_0043/individual/tree_bush_transparent.png"
+    "w": 110,
+    "h": 83,
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_061/individual/forest_transparent.png"
   },
   {
     "name": "d_sun",
@@ -267,16 +321,16 @@
     "file": "assets/sprites/d_sun.png",
     "w": 200,
     "h": 180,
-    "src": "assets/extracted_all/emblem-45/individual/sun_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/emblem-45/individual/sun_transparent.png"
   },
   {
     "name": "c_alchemist",
     "kind": "hero",
     "label": "The Alchemist",
     "file": "assets/sprites/c_alchemist.png",
-    "w": 44,
-    "h": 110,
-    "src": "sources/claudiens/site/images/emblems/emblem-21.jpg"
+    "w": 81,
+    "h": 200,
+    "src": "C:/Dev/Claudiens/site/images/emblems/emblem-21.jpg"
   },
   {
     "name": "c_atalanta",
@@ -285,7 +339,7 @@
     "file": "assets/sprites/c_atalanta.png",
     "w": 73,
     "h": 110,
-    "src": "assets/extracted_all/stolcius_plate_002/individual/woman_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_002/individual/woman_transparent.png"
   },
   {
     "name": "c_hippomenes",
@@ -294,7 +348,7 @@
     "file": "assets/sprites/c_hippomenes.png",
     "w": 53,
     "h": 110,
-    "src": "assets/extracted_all/splendor_solis_ia_p0038/individual/person_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/splendor_solis_ia_p0038/individual/person_transparent.png"
   },
   {
     "name": "q_king",
@@ -303,7 +357,7 @@
     "file": "assets/sprites/q_king.png",
     "w": 62,
     "h": 130,
-    "src": "assets/extracted_all/stolcius_plate_033/individual/man_old_man_transparent.png"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_033/individual/man_old_man_transparent.png"
   },
   {
     "name": "q_queen",
@@ -312,213 +366,6 @@
     "file": "assets/sprites/q_queen.png",
     "w": 59,
     "h": 130,
-    "src": "assets/extracted_all/stolcius_plate_044/individual/woman_queen_transparent.png"
-  },
-  {
-    "name": "m_tortoise",
-    "kind": "monster",
-    "label": "Stone Tortoise",
-    "file": "assets/sprites/m_tortoise.png",
-    "w": 190,
-    "h": 91,
-    "src": "assets/extracted_all/stolcius_plate_001/individual/tortoise_transparent.png"
-  },
-  {
-    "name": "m_horse",
-    "kind": "monster",
-    "label": "Night-Mare",
-    "file": "assets/sprites/m_horse.png",
-    "w": 220,
-    "h": 230,
-    "src": "assets/extracted_all/splendor_solis_local_p0022/individual/horse_transparent.png"
-  },
-  {
-    "name": "m_peacock",
-    "kind": "monster",
-    "label": "Cauda Pavonis",
-    "file": "assets/sprites/m_peacock.png",
-    "w": 220,
-    "h": 163,
-    "src": "assets/extracted_all/khunrath_p0197/individual/peacock_transparent.png"
-  },
-  {
-    "name": "m_dove",
-    "kind": "monster",
-    "label": "White Dove",
-    "file": "assets/sprites/m_dove.png",
-    "w": 124,
-    "h": 170,
-    "src": "assets/extracted_all/splendor_solis_ia_p0048/individual/bird_dove_transparent.png"
-  },
-  {
-    "name": "m_eagle",
-    "kind": "monster",
-    "label": "Eagle",
-    "file": "assets/sprites/m_eagle.png",
-    "w": 220,
-    "h": 138,
-    "src": "assets/extracted_all/stolcius_plate_032/individual/eagle_peacock_transparent.png"
-  },
-  {
-    "name": "m_fish",
-    "kind": "monster",
-    "label": "River Fish",
-    "file": "assets/sprites/m_fish.png",
-    "w": 200,
-    "h": 83,
-    "src": "assets/extracted_all/emblem-22/individual/fish_transparent.png"
-  },
-  {
-    "name": "s_house",
-    "kind": "structure",
-    "label": "Cottage",
-    "file": "assets/sprites/s_house.png",
-    "w": 96,
-    "h": 96,
-    "src": "Kenney Tiny Town (CC0)"
-  },
-  {
-    "name": "s_church",
-    "kind": "structure",
-    "label": "Chapel",
-    "file": "assets/sprites/s_church.png",
-    "w": 96,
-    "h": 96,
-    "src": "Kenney Tiny Town (CC0)"
-  },
-  {
-    "name": "s_furnace",
-    "kind": "structure",
-    "label": "Athanor",
-    "file": "assets/sprites/s_furnace.png",
-    "w": 128,
-    "h": 44,
-    "src": "Kenney Roguelike/RPG pack (CC0)"
-  },
-  {
-    "name": "s_altar",
-    "kind": "structure",
-    "label": "Shrine",
-    "file": "assets/sprites/s_altar.png",
-    "w": 128,
-    "h": 52,
-    "src": "assets/extracted_all/emblem-08/individual/altar_transparent.png"
-  },
-  {
-    "name": "t_water",
-    "kind": "terrain",
-    "label": "River",
-    "file": "assets/sprites/t_water.png",
-    "w": 128,
-    "h": 73,
-    "src": "assets/extracted_all/mclean_second_p0037/individual/river_sea_transparent.png"
-  },
-  {
-    "name": "t_garden",
-    "kind": "terrain",
-    "label": "Garden",
-    "file": "assets/sprites/t_garden.png",
-    "w": 128,
-    "h": 123,
-    "src": "assets/extracted_all/maier_arcana_p0071/individual/flower_transparent.png"
-  },
-  {
-    "name": "i_potion_green",
-    "kind": "icon",
-    "label": "i_potion_green",
-    "file": "assets/sprites/i_potion_green.png",
-    "w": 30,
-    "h": 39,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_potion_red",
-    "kind": "icon",
-    "label": "i_potion_red",
-    "file": "assets/sprites/i_potion_red.png",
-    "w": 30,
-    "h": 39,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_potion_blue",
-    "kind": "icon",
-    "label": "i_potion_blue",
-    "file": "assets/sprites/i_potion_blue.png",
-    "w": 30,
-    "h": 39,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_bottle",
-    "kind": "icon",
-    "label": "i_bottle",
-    "file": "assets/sprites/i_bottle.png",
-    "w": 24,
-    "h": 48,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_sword",
-    "kind": "icon",
-    "label": "i_sword",
-    "file": "assets/sprites/i_sword.png",
-    "w": 24,
-    "h": 48,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_shield",
-    "kind": "icon",
-    "label": "i_shield",
-    "file": "assets/sprites/i_shield.png",
-    "w": 24,
-    "h": 39,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_fire",
-    "kind": "icon",
-    "label": "i_fire",
-    "file": "assets/sprites/i_fire.png",
-    "w": 27,
-    "h": 36,
-    "src": "hand-drawn pixel icon"
-  },
-  {
-    "name": "i_coin",
-    "kind": "icon",
-    "label": "i_coin",
-    "file": "assets/sprites/i_coin.png",
-    "w": 36,
-    "h": 36,
-    "src": "hand-drawn pixel icon"
-  },
-  {
-    "name": "i_key",
-    "kind": "icon",
-    "label": "i_key",
-    "file": "assets/sprites/i_key.png",
-    "w": 36,
-    "h": 48,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_book",
-    "kind": "icon",
-    "label": "i_book",
-    "file": "assets/sprites/i_book.png",
-    "w": 48,
-    "h": 48,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
-  },
-  {
-    "name": "i_apple",
-    "kind": "icon",
-    "label": "i_apple",
-    "file": "assets/sprites/i_apple.png",
-    "w": 36,
-    "h": 42,
-    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+    "src": "C:/Dev/EmblemPrintShop/assets/extracted_all/stolcius_plate_044/individual/woman_queen_transparent.png"
   }
 ]

@@ -20,9 +20,9 @@ Run:  python game/tools/validate_assets.py
 """
 import os, re, json, sys, glob
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # EmblemPrintShop
-GAME = os.path.join(ROOT, 'game')
-JS   = os.path.join(GAME, 'js')
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # EmblemRoguelike repo root
+GAME = ROOT
+JS   = os.path.join(ROOT, 'js')
 
 
 def read(path):

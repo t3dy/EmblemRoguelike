@@ -26,8 +26,15 @@ const SCORE_KEY = 'emblem_knight_score_v1';
 class Game {
   constructor(canvas) {
     this.canvas = canvas;
+    this.W = 768; this.H = 576;
+    // Scale canvas to device physical pixels so it stays sharp on high-DPI screens.
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    canvas.width = this.W * dpr;
+    canvas.height = this.H * dpr;
+    canvas.style.width = this.W + 'px';
+    canvas.style.height = this.H + 'px';
     this.ctx = canvas.getContext('2d');
-    this.W = canvas.width; this.H = canvas.height;
+    this.ctx.scale(dpr, dpr);
     this.state = 'title';        // title|charselect|overworld|dungeon|battle|dialog|gameover|victory
     this.msg = new MessageBox();
     this.hero = null;
