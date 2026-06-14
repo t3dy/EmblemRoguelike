@@ -253,6 +253,23 @@ export const STAGES = [
 ];
 export const FINAL_FLOOR = 12;     // the Dragon waits here; beyond it lies the Lapis
 
+// the twelve themed floors of the Opus (Twelve Keys × colour stages, from research)
+export const FLOORS = [
+  { name: 'The Leprous Mines',        op: 'Purification' },
+  { name: 'The Forest of the Soul',   op: 'Mortification' },
+  { name: 'The Stinking Swamp',       op: 'Putrefaction' },
+  { name: 'The Hall of Scales',       op: 'Ablution' },
+  { name: 'The Sealed Vessel',        op: 'Dissolution' },
+  { name: 'The Rose Garden',          op: 'Conjunction' },
+  { name: 'The Besieged City',        op: 'Sublimation' },
+  { name: 'The Field of Decay',       op: 'Generation' },
+  { name: 'The Procession of Planets',op: 'The Zodiac Balance' },
+  { name: 'The Empty Furnace',        op: 'Fixation' },
+  { name: 'The Tower of Olympus',     op: 'Augmentation' },
+  { name: 'The Hall of Projection',   op: 'Multiplication' },
+];
+export function floorInfo(f) { return FLOORS[(f - 1)] || FLOORS[FLOORS.length - 1]; }
+
 // ---- Quests: random "calls to action" from Sol (King) & Luna (Queen) --------
 // Each quest is themed on a genuine Atalanta Fugiens motto (the imperative
 // "calls to action"). objective.kind: 'slay' (any), 'slayType' (monId),

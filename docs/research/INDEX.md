@@ -57,6 +57,23 @@ Research → artifacts (this folder) → **batched, reviewable implementation** 
 the live data-driven systems, category by category, each batch verified in preview
 and deployed. Target: 10–20 new assets of each type.
 
+## Implementation status (shipped vs planned)
+
+**Shipped (live):**
+- **Status-effect combat** — Blacken/Whiten/Redden/Coagulate/Dissolve/Venom/Charm with DoT/HoT, damage mods, monster `onHit` + specials (lifesteal/regen/ramp/dodge); spells WASH, PUTREFY. (`battle.js`)
+- **+11 monsters** (viper, leaden man, white eagle, wingless dragon, basilisk, nymph queen, salamander lord, sublime eagle, green & red lions, rex marinus) in region + stage pools. (`data.js`)
+- **Equipment** — weapons (Geber, Saturn scythe, Michael's lance, Sword of Sol) with `onHit`/`vs`; armour (white-earth robe, salamander hide, peacock mantle, purple robe); **medicines** (Aqua Ardens, Theriac, Quinta Essentia, Aurum Potabile) — sold in town shops.
+- **+3 classes** — Soror Mystica, Saturnine Senex (Leaden Hide), Hermes-Magus (Caduceus). (`data.js`, `battle.js`)
+- **+5 quests** — Theriac for the Plague, The Fifth Essence, Slay the Green Lion, Assay the Ore, Cure Them Gratis.
+- **12 named dungeon floors** (Leprous Mines → Hall of Projection) with per-floor operation, shown on descent + HUD. (`FLOORS` in `data.js`)
+
+**Planned next batches (designed in these artifacts):**
+- Patrons as overworld NPCs (Rudolf II, Maier, assayer) + the **Contract→Trial** loop.
+- Big meta-systems: **TRIA PRIMA** stats + Equality meter; **doom-clock**; reputation currencies; fraud skill.
+- Town **types** (mining/print/court) + special services (Powder Tower, Kunstkammer).
+- New **sprites** for raven, phoenix, pelican, gnome, undine, homunculus, rebis (art pass) → unlock those monsters/bosses.
+- Per-floor **special chambers** (Bath, Tomb, Rose Garden, Scales) + room events; `craft`/`escort` quest kinds.
+
 ## Source bibliography (priority tier mined first)
 
 Abraham *Dictionary of Alchemical Imagery* · DeVun *Rupescissa* · Meagan Allen

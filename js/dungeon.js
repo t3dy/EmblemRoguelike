@@ -2,7 +2,7 @@
 // Reuses the isometric projection. Floors are themed by the four colour stages
 // of the Great Work (Nigredo → Albedo → Citrinitas → Rubedo).
 import { Assets } from './assets.js';
-import { ITEMS, stageForFloor, FINAL_FLOOR, QUESTS } from './data.js';
+import { ITEMS, stageForFloor, floorInfo, FINAL_FLOOR, QUESTS } from './data.js';
 import { window9, text, COLORS } from './ui.js';
 
 const QUESTS_LOOKUP = Object.fromEntries(QUESTS.map(q => [q.id, q]));
@@ -360,8 +360,8 @@ export class Dungeon {
     const W = this.game.W, h = this.hero;
     // depth / stage banner (top-centre)
     window9(ctx, W / 2 - 150, 8, 300, 44);
-    text(ctx, `${this.stage.name} — ${this.stage.sub}`, W / 2, 14, { align: 'center', size: 15, color: COLORS.hi });
-    text(ctx, `Floor ${this.depth} / ${FINAL_FLOOR}`, W / 2, 32, { align: 'center', size: 13, color: COLORS.textDim });
+    text(ctx, `${floorInfo(this.depth).name}`, W / 2, 14, { align: 'center', size: 15, color: COLORS.hi });
+    text(ctx, `${this.stage.name} · Floor ${this.depth}/${FINAL_FLOOR}`, W / 2, 32, { align: 'center', size: 12, color: COLORS.textDim });
     // hero status (top-left)
     window9(ctx, 12, 8, 196, 64);
     text(ctx, `${h.name}  Lv ${h.level}`, 24, 14, { size: 14, color: COLORS.hi });

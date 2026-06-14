@@ -5,7 +5,7 @@ import { Battle } from './battle.js';
 import { Dungeon } from './dungeon.js';
 import { Town } from './town.js';
 import { Music } from './music.js?v=2';
-import { newHero, CLASSES, STAGES, stageForFloor, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats } from './data.js';
+import { newHero, CLASSES, STAGES, stageForFloor, floorInfo, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats } from './data.js';
 import { MessageBox, window9, parchmentCard, text, menu, COLORS } from './ui.js';
 
 const QUEST_BY_ID = Object.fromEntries(QUESTS.map(q => [q.id, q]));
@@ -98,8 +98,9 @@ class Game {
     this.state = 'dungeon';
     this.msg.queue = []; this.msg.done = true;
     const st = stageForFloor(depth);
+    const fl = floorInfo(depth);
     if (stageChanged) this.msg.push(`${st.name} — ${st.sub}.`, st.motto);
-    else this.msg.push(`Floor ${depth}.`);
+    this.msg.push(`Floor ${depth}: ${fl.name}.`, `The work here is ${fl.op}.`);
     if (depth === FINAL_FLOOR) this.msg.push('At the foot of the Work, the Dragon stirs...');
     this.questProgress('reach', { depth });
     this.save();
