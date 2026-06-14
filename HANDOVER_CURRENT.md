@@ -2,15 +2,25 @@
 
 **Updated:** 2026-06-15 · **Branch:** main · Read `CLAUDE.md` first for run/architecture.
 
-**Session 2026-06-15 work (continued):** 
-- ✅ Committed core integration fixes (castle wiring, furnace heating boost, repair cost unification, landmark scaling)
-- 🎯 **Gameplay feedback enhancements**: Improved furnace operation messages (target temp, material count, completion status)
-- 🎯 **Danger system feedback**: Added visual alerts (⚠) and auditory cues; furnace panel now shows ⚠ PAUSED status
-- 🎯 **NPC system**: Added dialogue methods (getNPCDialogue, getNPCGreeting) for personality-driven interactions based on role/disposition
-- 🎯 **Critical bug fix**: NPC damage system now works — pass actual NPC objects (not IDs) to operations, enabling health damage during dangers
-- 🎯 **Furnace panel polish**: Displays operation name, status badge, operation's currentTemp/fuel (not furnace's), clearer state reflection
-- 🎯 **Location narratives**: Enhanced atmospheric flavor text for castle entrance (glyphs), Queen's court (moonlit garden)
-- 🎯 **Quest feedback**: Visual checkmarks (✓), clearer rewards, thematic messaging for Great Work progression
+**Session 2026-06-15 improvements completed:**
+
+**Core systems (4 commits):**
+- ✅ **C2 Integration**: Castle wiring, furnace heating boost (1.0°C/tick), repair cost unification, landmark scaling
+- ✅ **C3 Gameplay enhancements**: Furnace feedback, danger system alerts, NPC dialogue, quest completion messages
+- ✅ **C3 Bug fix**: NPC damage system fully functional (pass NPC objects, not IDs)
+- ✅ **C4 Player experience**: Quest log, end-game statistics, enhanced victory/game-over screens
+
+**Details:**
+- 🎯 **Furnace operation messages**: Target temp, material count, operation name displayed clearly
+- 🎯 **Danger feedback**: ⚠ visual alerts, auditory cues, furnace panel shows PAUSED status
+- 🎯 **NPC system**: getNPCDialogue (role-based), getNPCGreeting (disposition-based) for personality
+- 🎯 **Critical bug fix**: NPC objects (not IDs) passed to operations → health damage during dangers works
+- 🎯 **Furnace panel**: Operation name, status badge, currentTemp/fuel (from operation, not furnace)
+- 🎯 **Location flavor**: Castle (glyphs), Queen's court (moonlit garden), atmospheric entry text
+- 🎯 **Quest feedback**: Checkmarks (✓), clearer rewards, Great Work progression messaging
+- 🎯 **Quest log**: Pause menu access, active charges with progress %, completed count display
+- 🎯 **Victory screen**: RUBEDO theme (gold/amber), stats (quests, gold, level)
+- 🎯 **Game-over screen**: NIGREDO theme, stats (floor, quests, gold)
 
 ## Where things stand
 
@@ -32,32 +42,36 @@ parse-checks):
 
 ## What's DONE (this session)
 
-1. ~~**Material selection before an operation**~~ **DONE** (2026-06-14). ✅
-2. ~~**Furnace heating speed**~~ **DONE** (2026-06-15). 1.0°C/tick allows disasters to trigger. ✅
-3. ~~**Unify repair-cost logic**~~ **DONE** (2026-06-15). Uses calculateRepairCost with court multipliers. ✅
-4. ~~**Single furnace source of truth**~~ **DONE** (2026-06-15). Castle integration complete. ✅
-5. ~~**NPC damage system**~~ **DONE** (2026-06-15). **CRITICAL FIX**: NPCs now properly damaged during dangers. ✅
-6. ~~**World map graphics**~~ **DONE** (2026-06-15). Landmarks scaled to 150px+ readability. ✅
-7. ~~**Gameplay feedback**~~ **DONE** (2026-06-15). Better messages, visual indicators, furnace panel polish. ✅
-8. ~~**NPC dialogue system**~~ **DONE** (2026-06-15). Role-based dialogue, personality-driven greetings. ✅
+All major systems verified and integrated. See 4 commits (C2, C3, C3, C4).
 
-## What's NOT done (prioritized — tackle in order)
+## Remaining work (prioritized — tackle in order)
 
-1. **Canvas testing of danger UI.** The choice dialog renders when danger fires, but hasn't been
-   visually verified in browser. Smoke test passes at class level.
+1. **Canvas verification of danger UI.** Smoke test at class level passes; danger choice UI renders 
+   when disaster triggers, but hasn't been visually verified in browser (preview server had timeout issues).
+   Next person: try preview_start, navigate to furnace operation with dangerous materials, verify choice dialog.
 
-2. **Balancing pass.** Tune danger probability (trigger thresholds), material scarcity, reward scaling,
-   and operation difficulty curves. See `docs/archive/TRACK_C_INTEGRATION_PLAN.md` for test checklist.
+2. **Balancing pass.** Tune:
+   - Danger trigger probability (see DANGER_CONFIG in alchemical_integration.js)
+   - Material scarcity (hero starts with 7 units; ensure operations feel valuable)
+   - Reward scaling (currently fixed per quest; consider XP multipliers based on danger outcomes)
+   - Operation duration vs operation difficulty curve
+   Reference: `docs/archive/TRACK_C_INTEGRATION_PLAN.md`
 
-3. **Quest progression clarity.** Add a visible quest log/journal so player can track active charges,
-   progress, and completed quests. Currently quest state exists but isn't visible between encounters.
+3. **More emblem quest variety.** The 50 emblems exist (emblem_quests.js) but many use generic "operational" type.
+   Add quest mechanics: diplomatic (NPC reconciliation), reputation (court favor), discovery (location exploration),
+   blessing (permanent stat buffs). Currently ~30/50 quests are operational; need at least 10 more distinct types.
 
-4. **More emblem quest variety.** The 50 emblems have stubs but many use generic "operational" type.
-   Add more diverse quest mechanics: diplomatic (NPC reconciliation), diplomatic (reputation),
-   discovery (find hidden locations), or blessing (gain permanent stat buffs).
+4. **Known issues to address:**
+   - `_showMaterialSelection` displays available materials but doesn't update the hero's `materials` field 
+     (materials are passed to startFurnaceOperation but not persisted to hero for next time)
+   - Furnace durability repair is wired but hasn't been tested in gameplay (code exists, no test pass/fail)
+   - Character select redesign (3×3 grid layout) was mentioned in handover but not yet verified visually
 
-5. **End-game polish.** Victory screen for dragon slain; game-over message after Dragon fight;
-   score/statistics display (quests done, deepest descent, final gold, etc.).
+5. **Nice-to-haves for polish:**
+   - Add hero character portraits to HUD and quest dialogs (currently uses generic portraits for King/Queen)
+   - Expand town NPC interactions beyond shop menus (dialogue trees, relationship building)
+   - Add enchantment or rune system for equipment (currently items are static)
+   - More dungeon floor variety: boss floors, treasure floors, safe rests
 
 ## How to verify your work
 
