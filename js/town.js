@@ -1,7 +1,7 @@
 // town.js — an enterable settlement: church (heal), inn (full rest), apothecary
 // (alchemical medicines), armoury (weapons & armour). Menu-driven, JRPG-style.
 import { Assets } from './assets.js';
-import { ITEMS, WEAPONS, ARMOR, recomputeStats } from './data.js';
+import { ITEMS, WEAPONS, ARMOR, recomputeStats, iconFor } from './data.js';
 import { window9, parchmentCard, text, menu, bar, COLORS } from './ui.js';
 
 const ROOT_MENU = [
@@ -226,9 +226,11 @@ export class Town {
         const studied = e.kind === 'book' && h.flags.books && h.flags.books[e.key];
         const tooDear = !selling && e.cost > h.gold;
         const col = sel ? COLORS.hi : (studied ? '#8a8a6a' : (tooDear ? '#9a6a6a' : COLORS.text));
-        if (sel) text(ctx, '▶', bx + 16, yy, { color: COLORS.hi });
+        if (sel) text(ctx, '▶', bx + 10, yy, { color: COLORS.hi });
+        const ic = Assets.img(iconFor(e.kind, e.key));
+        if (ic) { const s = 16 / Math.max(ic.width, ic.height); ctx.drawImage(ic, bx + 26, yy - 3, ic.width * s, ic.height * s); }
         const tag = owned ? ' (equipped)' : (studied ? ' (studied)' : '');
-        text(ctx, e.name + tag, bx + 36, yy, { size: 14, color: col });
+        text(ctx, e.name + tag, bx + 48, yy, { size: 14, color: col });
         text(ctx, (selling ? '+' : '') + e.cost + 'g', bx + bw - 150, yy, { size: 14, color: col });
       });
       if (this.list[this.sel]) text(ctx, this.list[this.sel].desc, bx + 36, by + 210, { size: 12, color: COLORS.textDim });

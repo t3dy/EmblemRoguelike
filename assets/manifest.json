@@ -421,5 +421,104 @@
     "w": 110,
     "h": 107,
     "src": "assets/extracted_all/maier_arcana_p0071/individual/flower_transparent.png"
+  },
+  {
+    "name": "i_potion_green",
+    "kind": "icon",
+    "label": "i_potion_green",
+    "file": "assets/sprites/i_potion_green.png",
+    "w": 30,
+    "h": 39,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_potion_red",
+    "kind": "icon",
+    "label": "i_potion_red",
+    "file": "assets/sprites/i_potion_red.png",
+    "w": 30,
+    "h": 39,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_potion_blue",
+    "kind": "icon",
+    "label": "i_potion_blue",
+    "file": "assets/sprites/i_potion_blue.png",
+    "w": 30,
+    "h": 39,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_bottle",
+    "kind": "icon",
+    "label": "i_bottle",
+    "file": "assets/sprites/i_bottle.png",
+    "w": 24,
+    "h": 48,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_sword",
+    "kind": "icon",
+    "label": "i_sword",
+    "file": "assets/sprites/i_sword.png",
+    "w": 24,
+    "h": 48,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_shield",
+    "kind": "icon",
+    "label": "i_shield",
+    "file": "assets/sprites/i_shield.png",
+    "w": 24,
+    "h": 39,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_fire",
+    "kind": "icon",
+    "label": "i_fire",
+    "file": "assets/sprites/i_fire.png",
+    "w": 27,
+    "h": 36,
+    "src": "hand-drawn pixel icon"
+  },
+  {
+    "name": "i_coin",
+    "kind": "icon",
+    "label": "i_coin",
+    "file": "assets/sprites/i_coin.png",
+    "w": 36,
+    "h": 36,
+    "src": "hand-drawn pixel icon"
+  },
+  {
+    "name": "i_key",
+    "kind": "icon",
+    "label": "i_key",
+    "file": "assets/sprites/i_key.png",
+    "w": 36,
+    "h": 48,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_book",
+    "kind": "icon",
+    "label": "i_book",
+    "file": "assets/sprites/i_book.png",
+    "w": 48,
+    "h": 48,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
+  },
+  {
+    "name": "i_apple",
+    "kind": "icon",
+    "label": "i_apple",
+    "file": "assets/sprites/i_apple.png",
+    "w": 36,
+    "h": 42,
+    "src": "Kenney Tiny Dungeon/Tiny Town (CC0)"
   }
 ]

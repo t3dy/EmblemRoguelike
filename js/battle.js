@@ -1,6 +1,6 @@
 // battle.js — Dragon Warrior style first-person battle.
 import { Assets } from './assets.js';
-import { MONSTERS, SPELLS, ITEMS, WEAPONS, LEVELS, statsForLevel, spellsForLevel, recomputeStats } from './data.js';
+import { MONSTERS, SPELLS, ITEMS, WEAPONS, LEVELS, statsForLevel, spellsForLevel, recomputeStats, iconFor } from './data.js';
 
 // status effects (alchemical colour operations). turns + per-tick behaviour.
 const STATUS = {
@@ -447,6 +447,11 @@ export class Battle {
         const subW = W - cw - 44;
         window9(ctx, cw + 30, boxY, subW, boxH);
         menu(ctx, this.subList.map(s => s.label), cw + 66, boxY + 16, this.sub, { lh: 24 });
+        // icons beside each entry (items only; spells have none)
+        this.subList.forEach((s, i) => {
+          const ic = Assets.img(iconFor(this.subType, s.key));
+          if (ic) { const sc = 18 / Math.max(ic.width, ic.height); ctx.drawImage(ic, cw + 44, boxY + 14 + i * 24 - 2, ic.width * sc, ic.height * sc); }
+        });
       } else {
         // prompt
         const subW = W - cw - 44;

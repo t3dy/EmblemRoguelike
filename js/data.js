@@ -154,6 +154,20 @@ export const ITEMS = {
   powder:  { id:'powder',  name:'Powder of Projection',type:'transmute',power:0,desc:'Project a non-boss foe straight into gold' },
 };
 
+// ---- UI icons (CC0 pixel sprites) for menus ---------------------------------
+export const ITEM_ICON = {
+  herb: 'i_potion_green', ardens: 'i_potion_red', potion: 'i_potion_blue',
+  theriac: 'i_bottle', elixir: 'i_potion_red', quinta: 'i_potion_blue',
+  aurum: 'i_coin', apple: 'i_apple', greekfire: 'i_fire', powder: 'i_coin',
+};
+export function iconFor(kind, key) {
+  if (kind === 'weapon') return 'i_sword';
+  if (kind === 'armor') return 'i_shield';
+  if (kind === 'book') return 'i_book';
+  if (kind === 'sell' || kind === 'item') return ITEM_ICON[key] || 'i_bottle';
+  return ITEM_ICON[key] || null;
+}
+
 // ---- Level curve ------------------------------------------------------------
 // index = level-1. each entry: xp needed to REACH that level (cumulative).
 export const LEVELS = [
