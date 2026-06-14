@@ -28,7 +28,11 @@ The story is grounded in the project's own alchemy databases (`C:\Dev\Claudiens`
 - The goal is the **Lapis / Philosopher's Stone**; *festina lente* ("make haste
   slowly") is the recurring watchword.
 
-## Run it
+## Play it
+
+**[Play online →](https://t3dy.github.io/EmblemRoguelike/)** (GitHub Pages)
+
+## Run it locally
 
 A static server is registered in `.claude/launch.json` as **emblem-knight**
 (serves this `game/` folder on port 7431):
