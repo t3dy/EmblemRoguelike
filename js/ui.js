@@ -150,23 +150,30 @@ export function renderFurnacePanel(ctx, x, y, operation, furnace) {
   let cy = y + pad;
 
   // ---- Title: Operation Name ----
-  text(ctx, 'FURNACE OPERATION', x + pad, cy, { size: 14, color: COLORS.hi });
+  const opName = operation.operationId ? operation.operationId.charAt(0).toUpperCase() + operation.operationId.slice(1) : 'Operation';
+  text(ctx, opName.toUpperCase(), x + pad, cy, { size: 14, color: COLORS.hi });
   cy += lh;
 
+  // ---- Status Badge ----
+  const statusColor = operation.status === 'paused' ? '#e0584b' : '#8bc34a';
+  const statusText = operation.status === 'paused' ? '⚠ PAUSED' : operation.status.toUpperCase();
+  text(ctx, statusText, x + pad + barW - 80, cy - lh, { size: 11, color: statusColor });
+
   // ---- Temperature Gauge ----
-  const tempPercent = Math.min(1, furnace.temperature / 200); // 0-200°C range
+  const currentTemp = operation.currentTemp || 20;
+  const tempPercent = Math.min(1, currentTemp / 200); // 0-200°C range
   const tempColor = tempPercent < 0.3 ? '#4a90e2'      // blue (cold)
                   : tempPercent < 0.6 ? '#f5a623'      // orange (warming)
                   : tempPercent < 0.85 ? '#f8e71c'     // yellow (hot)
                   : '#e0584b';                           // red (very hot)
 
-  text(ctx, `Temp: ${Math.floor(furnace.temperature)}°C / ${operation.targetTemp}°C`, x + pad, cy, { size: 12 });
+  text(ctx, `Temp: ${Math.floor(currentTemp)}°C / ${operation.targetTemp}°C`, x + pad, cy, { size: 12 });
   cy += 16;
   bar(ctx, x + pad, cy, barW, barH, tempPercent, tempColor);
   cy += barH + 8;
 
   // ---- Fuel Bar ----
-  const fuelPercent = Math.min(1, furnace.fuel / furnace.fuelCapacity);
+  const fuelPercent = Math.min(1, operation.fuel / 20);
   text(ctx, `Fuel: ${Math.floor(fuelPercent * 100)}%`, x + pad, cy, { size: 12 });
   cy += 16;
   bar(ctx, x + pad, cy, barW, barH, fuelPercent, '#8b6f47');

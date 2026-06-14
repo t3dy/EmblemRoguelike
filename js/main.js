@@ -706,11 +706,11 @@ class Game {
     }
     this.activeFurnace.targetTemp = targetTemp;
 
-    // C1: Get NPCs present in this room from the castle
+    // C1: Get NPCs present in this room from the castle (pass actual NPC objects, not just IDs)
     const npcsInRoom = [];
     if (this.castle && roomId) {
       Object.values(this.castle.NPCs).forEach(npc => {
-        if (npc.location === roomId) npcsInRoom.push(npc.id);
+        if (npc.location === roomId) npcsInRoom.push(npc);
       });
     }
 
