@@ -112,7 +112,7 @@ class Game {
     this.msg.queue = []; this.msg.done = true;
     const st = stageForFloor(depth);
     const fl = floorInfo(depth);
-    if (stageChanged) this.msg.push(`${st.name} — ${st.sub}.`, st.motto);
+    if (stageChanged) this.msg.push(`${st.name} — ${st.sub}.`, `${st.latin ? st.latin + '.  ' : ''}${st.motto}`);
     this.msg.push(`Floor ${depth}: ${fl.name}.`, `The work here is ${fl.op}.`);
     if (depth === FINAL_FLOOR) this.msg.push('At the foot of the Work, the Dragon stirs...');
     this.questProgress('reach', { depth });
@@ -290,6 +290,34 @@ class Game {
     } else {
       this.offerQuest('queen');    // the Queen sets a charge from her bower
     }
+  }
+  // Elchyell, Queen of the Elves — faerie recipe-mentor (Grund, *Anglia*). A rare
+  // benevolent glade encounter that gifts a boon of the hidden Art.
+  faerieMentor() {
+    const h = this.hero;
+    h.flags.faerie = (h.flags.faerie || 0) + 1;
+    let line, apply;
+    const r = Math.random();
+    if (!h.spells.includes('WASH')) {
+      apply = () => { h.spells.push('WASH'); };
+      line = 'ELCHYELL: Learn the Washing — say WASH, and curses fall away.';
+    } else if (r < 0.4) {
+      apply = () => { h.items.greekfire = (h.items.greekfire || 0) + 1; };
+      line = 'She presses a vial of quenchless Greek Fire into thy hand.';
+    } else if (r < 0.7) {
+      apply = () => { h.items.theriac = (h.items.theriac || 0) + 1; h.items.apple = (h.items.apple || 0) + 1; };
+      line = 'She gifts thee Theriac and a Golden Apple.';
+    } else {
+      const g = 20 + Math.floor(Math.random() * 30);
+      apply = () => { h.gold += g; };
+      line = `She scatters faerie gold at thy feet — ${g} pieces.`;
+    }
+    this.dialog([
+      'A ring of glowing mushrooms opens in the wood.',
+      'ELCHYELL, Queen of the Elves, steps from the green shade.',
+      'ELCHYELL: Few find my glade, adept. Take a gift of the hidden Art.',
+      line
+    ], () => { apply(); this.save(); });
   }
   enterTown() {
     this.town = new Town(this, 'Village of Mercurius');

@@ -15,7 +15,7 @@ const ROOT_MENU = [
 ];
 
 // what each shop sells
-const APOTHECARY = ['herb', 'ardens', 'potion', 'theriac', 'elixir', 'quinta', 'aurum', 'apple'];
+const APOTHECARY = ['herb', 'ardens', 'potion', 'theriac', 'greekfire', 'elixir', 'quinta', 'powder', 'aurum', 'apple'];
 const ARMOURY = {
   weapons: ['dagger', 'sword', 'geber', 'falchion', 'scythe', 'michael', 'sol', 'flameblade'],
   armour: ['leather', 'whiterobe', 'mail', 'salahide', 'peacockmantle', 'plate', 'purple'],
@@ -96,7 +96,7 @@ export class Town {
     }
   }
 
-  _itemCost(k) { return ({ herb: 15, ardens: 18, potion: 12, theriac: 35, elixir: 60, quinta: 120, aurum: 200, apple: 40 })[k] || 20; }
+  _itemCost(k) { return ({ herb: 15, ardens: 18, potion: 12, theriac: 35, greekfire: 45, elixir: 60, quinta: 120, powder: 150, aurum: 200, apple: 40 })[k] || 20; }
 
   _buy(entry) {
     const h = this.game.hero;

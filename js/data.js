@@ -78,6 +78,15 @@ export const MONSTERS = {
   green_lion:   { id:'green_lion',   name:'Green Lion',     sprite:'m_lion',      hp:90, atk:20, def:12, xp:120,gold:90, scale:1.0,  special:'lifesteal' },
   red_lion:     { id:'red_lion',     name:'Red Lion',       sprite:'m_lion',      hp:130,atk:26, def:14, xp:200,gold:150,scale:1.0,  special:'lifesteal' },
   rex_marinus:  { id:'rex_marinus',  name:'Rex Marinus',    sprite:'king',        hp:120,atk:22, def:16, xp:160,gold:120,scale:1.0,  onHit:'dissolve' },
+  // --- the seven planetary metals (Geber: metals as graded "bodies") ---
+  // (reuse emblem sprites for now; a dedicated metal-sprite art pass is queued)
+  saturn:   { id:'saturn',   name:'Saturn · Lead',   sprite:'m_tortoise',  hp:46, atk:8,  def:6,  xp:14, gold:22, scale:0.7,  onHit:'tartar' },   // ponderous sponge, rich in base matter
+  jupiter:  { id:'jupiter',  name:'Jupiter · Tin',   sprite:'m_eagle',     hp:30, atk:14, def:5,  xp:16, gold:14, scale:0.75, onHit:'dissolve' },  // brittle — shreds armour
+  mars:     { id:'mars',     name:'Mars · Iron',     sprite:'m_boar',      hp:54, atk:20, def:14, xp:34, gold:18, scale:0.8,  special:'regen' },   // hard, slow to fell
+  venus:    { id:'venus',    name:'Venus · Copper',  sprite:'m_dove',      hp:40, atk:16, def:8,  xp:22, gold:24, scale:0.7,  special:'ramp' },    // livid, grows fierce
+  mercury:  { id:'mercury',  name:'Mercury · Quicksilver', sprite:'m_serpent', hp:34, atk:18, def:6, xp:28, gold:30, scale:0.7, special:'dodge', onHit:'dissolve' }, // fugitive
+  luna_metal:{id:'luna_metal',name:'Luna · Silver',  sprite:'m_swan',      hp:60, atk:20, def:11, xp:66, gold:80, scale:0.85, special:'dodge' },   // perfect body, hard to strike
+  sol_metal:{ id:'sol_metal',name:'Sol · Gold',      sprite:'m_lion',      hp:110,atk:26, def:16, xp:150,gold:200,scale:1.0,  special:'regen' },   // the perfect body, boss-tier
   dragon:    { id:'dragon',    name:'The Alchemical Dragon', sprite:'m_dragon', hp:160, atk:36, def:17, xp:240, gold:340, scale:1.0, spell:'BURN', boss:true },
 };
 
@@ -113,12 +122,12 @@ export const REGION_SCALE = {
 // region encounter pools keyed by tile type
 export const REGION_POOLS = {
   grass:    ['dove', 'fish', 'toad', 'tortoise'],          // gentle starting country
-  plains:   ['toad', 'serpent', 'tortoise', 'swan', 'leaden', 'viper'],
-  forest:   ['wolf', 'stag', 'boar', 'peacock', 'viper', 'white_eagle'],
-  woods:    ['wolf', 'bear', 'eagle', 'peacock', 'salamander', 'wingless'],
-  cliff:    ['eagle', 'harpy', 'horse', 'stag', 'eagle_sublime', 'basilisk'],
-  cave:     ['lion', 'wlion', 'salamander', 'ouroboros', 'basilisk', 'nymph_queen'],
-  badlands: ['lion', 'wlion', 'horse', 'wyrm', 'ouroboros', 'green_lion', 'red_lion', 'rex_marinus'],
+  plains:   ['toad', 'serpent', 'tortoise', 'swan', 'leaden', 'viper', 'saturn'],
+  forest:   ['wolf', 'stag', 'boar', 'peacock', 'viper', 'white_eagle', 'jupiter'],
+  woods:    ['wolf', 'bear', 'eagle', 'peacock', 'salamander', 'wingless', 'venus'],
+  cliff:    ['eagle', 'harpy', 'horse', 'stag', 'eagle_sublime', 'basilisk', 'mars', 'mercury'],
+  cave:     ['lion', 'wlion', 'salamander', 'ouroboros', 'basilisk', 'nymph_queen', 'mercury'],
+  badlands: ['lion', 'wlion', 'horse', 'wyrm', 'ouroboros', 'green_lion', 'red_lion', 'rex_marinus', 'luna_metal', 'sol_metal'],
 };
 
 // ---- Spells -----------------------------------------------------------------
@@ -141,6 +150,8 @@ export const ITEMS = {
   quinta:  { id:'quinta',  name:'Quinta Essentia',type:'full',power:0, desc:'Fully restores HP & MP & cleanses all' },
   aurum:   { id:'aurum',   name:'Aurum Potabile',type:'maxhp',power:10,desc:'+10 max HP, permanently' },
   apple:   { id:'apple',   name:'Golden Apple',  type:'flee', power:0,  desc:'Cast down to flee any battle (even bosses)' },
+  greekfire:{ id:'greekfire',name:'Greek Fire',  type:'throw',power:30, desc:'Hurl: ~34 dmg, ignores armour, cannot be quenched' },
+  powder:  { id:'powder',  name:'Powder of Projection',type:'transmute',power:0,desc:'Project a non-boss foe straight into gold' },
 };
 
 // ---- Level curve ------------------------------------------------------------
@@ -247,21 +258,21 @@ export const CLASS_BY_ID = Object.fromEntries(CLASSES.map(c => [c.id, c]));
 // floors are grouped into the four colour stages; each shows a real Maier motto.
 export const STAGES = [
   { key: 'nigredo',    name: 'NIGREDO',    sub: 'The Blackening',  floors: [1, 3],
-    tint: '#2a2630', wall: '#46414f', floor: '#2f2b36',
+    tint: '#2a2630', wall: '#46414f', floor: '#2f2b36', latin: 'SOLVE — dissolve the body',
     motto: '"Putrefaction is the beginning of generation."',
-    pool: ['toad', 'serpent', 'swan', 'wolf', 'bear', 'viper', 'leaden'] },
+    pool: ['toad', 'serpent', 'swan', 'wolf', 'bear', 'viper', 'leaden', 'saturn'] },
   { key: 'albedo',     name: 'ALBEDO',     sub: 'The Whitening',   floors: [4, 6],
-    tint: '#4a4e57', wall: '#9aa0ab', floor: '#6f747e',
+    tint: '#4a4e57', wall: '#9aa0ab', floor: '#6f747e', latin: 'ABLUTIO — wash it white',
     motto: '"Go to the woman who washes the sheets, and do as she does."',
-    pool: ['wolf', 'stag', 'boar', 'harpy', 'salamander', 'white_eagle', 'wingless', 'nymph_queen'] },
+    pool: ['wolf', 'stag', 'boar', 'harpy', 'salamander', 'white_eagle', 'wingless', 'nymph_queen', 'jupiter', 'venus'] },
   { key: 'citrinitas', name: 'CITRINITAS', sub: 'The Yellowing',   floors: [7, 9],
-    tint: '#5a4a22', wall: '#b9912f', floor: '#7d6322',
+    tint: '#5a4a22', wall: '#b9912f', floor: '#7d6322', latin: 'CIBATIO — feed the gold',
     motto: '"Nature teaches Nature; Nature conquers Nature."',
-    pool: ['lion', 'wlion', 'harpy', 'salamander', 'boar', 'basilisk', 'eagle_sublime', 'green_lion'] },
+    pool: ['lion', 'wlion', 'harpy', 'salamander', 'boar', 'basilisk', 'eagle_sublime', 'green_lion', 'mars', 'mercury'] },
   { key: 'rubedo',     name: 'RUBEDO',     sub: 'The Reddening',   floors: [10, 12],
-    tint: '#4a1d1d', wall: '#a23a2f', floor: '#5a2420',
+    tint: '#4a1d1d', wall: '#a23a2f', floor: '#5a2420', latin: 'COAGULA — fix the Stone',
     motto: '"Make a circle of man and woman... and thou shalt have the Stone."',
-    pool: ['lion', 'wlion', 'wyrm', 'ouroboros', 'red_lion', 'salamander_lord', 'rex_marinus'] },
+    pool: ['lion', 'wlion', 'wyrm', 'ouroboros', 'red_lion', 'salamander_lord', 'rex_marinus', 'luna_metal', 'sol_metal'] },
 ];
 export const FINAL_FLOOR = 12;     // the Dragon waits here; beyond it lies the Lapis
 
@@ -377,6 +388,16 @@ export const QUESTS = [
     poem: ['Wear no badge and charge no fee;', 'heal the poor, and hidden be.'],
     objective: { kind: 'collect', target: 4 },
     reward: { item: ['apple', 1], xp: 12 } },
+  { id: 'k_iron', giver: 'king', roman: '—', title: 'The Hardest Metal',
+    call: 'Master Mars — the iron of most difficult and tedious labour.',
+    poem: ['The iron resists both fire and file;', 'break it, and earn the adept’s smile.'],
+    objective: { kind: 'slayType', monId: 'mars', target: 2 },
+    reward: { gold: 60, item: ['greekfire', 2] } },
+  { id: 'k_perfect', giver: 'king', roman: '—', title: 'The Two Perfect Bodies',
+    call: 'Only Sol and Luna endure the examen — fell the perfect metals.',
+    poem: ['Gold and silver alone stand the test;', 'overcome them, and gain the best.'],
+    objective: { kind: 'slayType', monId: 'sol_metal', target: 1, alt: 'luna_metal' },
+    reward: { item: ['powder', 1], xp: 40, maxhp: 6 } },
 
   // --- THE GREAT WORK questline (chained, in order, culminates at the Dragon) ---
   { id: 'opus1', giver: 'king', line: 'opus', step: 1, roman: 'XIV', title: 'The Great Work I — Nigredo',

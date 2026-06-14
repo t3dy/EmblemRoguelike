@@ -116,6 +116,10 @@ export class World {
       this.stepsToEnc--;
       if (this.stepsToEnc <= 0) {
         this.stepsToEnc = this._rollSteps();
+        // benevolent: Elchyell, Queen of the Elves, haunts the wooded glades
+        if ((tt === 'forest' || tt === 'woods') && Math.random() < 0.16 && this.game.faerieMentor) {
+          this.game.faerieMentor(); return;
+        }
         const pool = REGION_POOLS[tt] || REGION_POOLS.grass;
         const id = pool[Math.floor(Math.random() * pool.length)];
         const scale = REGION_SCALE[tt] || 1;

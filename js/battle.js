@@ -11,6 +11,7 @@ const STATUS = {
   dissolve: { label: 'Dissolve', atkMul: 0.6, defMod: -2 },
   coagulate:{ label: 'Coagulate', defMod: 3, skip: 0.5 },
   charm:    { label: 'Charm', skip: 1 },
+  tartar:   { label: 'Tartar', dot: 1, atkMul: 0.75, defMod: -1 },  // petrifying stone-disease
 };
 import { window9, parchmentCard, text, menu, bar, COLORS } from './ui.js';
 
@@ -222,7 +223,7 @@ export class Battle {
     } else if (it.type === 'cure') {
       const amt = it.power + Math.floor(Math.random() * 6);
       this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + amt);
-      this.heroSt = this.heroSt.filter(s => !['blacken', 'venom', 'coagulate', 'dissolve'].includes(s.key));
+      this.heroSt = this.heroSt.filter(s => !['blacken', 'venom', 'coagulate', 'dissolve', 'tartar'].includes(s.key));
       this.game.sfx('heal');
       this.game.msg.push(`Used ${it.name}.`, `Healed ${amt} and cleansed of poison & curse.`);
       this.pendingResolve = () => this._afterHeroAction(false);
@@ -231,6 +232,23 @@ export class Battle {
       this.game.sfx('level');
       this.game.msg.push(`Quaffed the ${it.name}!`, `Max HP raised by ${it.power}.`);
       this.pendingResolve = () => this._afterHeroAction(false);
+    } else if (it.type === 'throw') {
+      // Greek fire — quenchless incendiary; damage ignores the foe's armour.
+      const dmg = it.power + Math.floor(Math.random() * 8);
+      this.mon.hp -= dmg; this.mon._hit = true;
+      this.flash = 0.45; this.shake = 0.4; this.game.sfx('magic');
+      this.game.msg.push(`Hurled ${it.name}!`, `Quenchless flame — ${this.mon.name} takes ${dmg} damage (armour ignored).`);
+      this.pendingResolve = () => this._afterHeroAction();
+    } else if (it.type === 'transmute') {
+      // Powder of Projection — project a non-boss foe into gold (instant loot).
+      if (this.mon.boss) {
+        this.game.msg.push(`Cast the ${it.name}…`, 'The Dragon is too great to transmute!');
+        this.pendingResolve = () => this._afterHeroAction(false);
+      } else {
+        this.mon.hp = 0; this.flash = 0.5; this.game.sfx('magic');
+        this.game.msg.push(`Cast the ${it.name} upon ${this.mon.name}!`, 'Its base matter is projected into gold!');
+        this.pendingResolve = () => this._enemyDefeated();
+      }
     } else if (it.type === 'flee') {
       // Golden Apple — Atalanta's trick: escape any battle, even a boss.
       this.game.sfx('heal');
