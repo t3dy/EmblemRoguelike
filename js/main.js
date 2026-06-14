@@ -3,6 +3,7 @@ import { Assets } from './assets.js';
 import { World, tileType } from './world.js';
 import { Battle } from './battle.js';
 import { Dungeon } from './dungeon.js';
+import { Town } from './town.js';
 import { Music } from './music.js?v=2';
 import { newHero, CLASSES, STAGES, stageForFloor, FINAL_FLOOR, QUESTS, OPUS_LINE, questsByGiver, ITEMS, MONSTERS, recomputeStats } from './data.js';
 import { MessageBox, window9, parchmentCard, text, menu, COLORS } from './ui.js';
@@ -22,6 +23,7 @@ class Game {
     this.hero = null;
     this.world = null;
     this.dungeon = null;
+    this.town = null;
     this.battle = null;
     this._dungeonEnemy = null;   // enemy ref when a battle was started from the dungeon
     this.titleSel = 0;
@@ -276,11 +278,14 @@ class Game {
     }
   }
   enterTown() {
-    const cost = 0;
-    this.dialog([
-      'INNKEEPER: Rest here, weary one. Thy wounds are mended.',
-      'HP and MP fully restored.'
-    ], () => { this.hero.hp = this.hero.maxHp; this.hero.mp = this.hero.maxMp; this.sfx('heal'); this.save(); });
+    this.town = new Town(this, 'Village of Mercurius');
+    this.state = 'town';
+    this.msg.queue = []; this.msg.done = true;
+  }
+  leaveTown() {
+    this.town = null;
+    this.state = 'overworld';
+    this.save();
   }
   enterDungeon() {
     if (this.hero.flags.dragonSlain) {
@@ -374,6 +379,7 @@ class Game {
       else if (k === 'cancel') this.declineQuest();
       return;
     }
+    if (this.state === 'town' && this.town) { this.town.input(k); return; }
     if (this.state === 'dungeon') {
       if (!this.msg.empty) { if (k === 'confirm') this.msg.advance(); return; }
       if (k === 'up')    this.dungeon.step(-1, -1);
@@ -421,6 +427,8 @@ class Game {
       this.world.render(ctx);
       this._hud(ctx);
       if (!this.msg.empty) this.msg.render(ctx, 14, this.H - 116, this.W - 28, 104);
+    } else if (this.state === 'town' && this.town) {
+      this.town.render(ctx);
     } else if (this.state === 'dungeon' && this.dungeon) {
       this.dungeon.render(ctx);
       if (!this.msg.empty) this.msg.render(ctx, 14, this.H - 116, this.W - 28, 104);

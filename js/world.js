@@ -187,6 +187,9 @@ export class World {
             const scale = DECO_SCALE[tt] || 0.7;
             const dw = img.width * scale, dh = img.height * scale;
             ctx.drawImage(img, sx - dw / 2, sy + TILE_H / 2 - dh, dw, dh);
+            // floating name banner over enterable landmarks (map clarity)
+            const LAND_LABEL = { castle: 'Sun-Castle', queencourt: "Queen's Bower", town: 'Town', dungeon: 'The Opus ▼' };
+            if (LAND_LABEL[tt]) this._label(ctx, LAND_LABEL[tt], sx, sy + TILE_H / 2 - dh - 6);
           }
         }
 
@@ -200,6 +203,19 @@ export class World {
 
   heroGX() { const h = this.hero; return this.move ? this.move.fx + this.move.dgx * Math.min(1, this.move.t/this.move.dur) : h.gx; }
   heroGY() { const h = this.hero; return this.move ? this.move.fy + this.move.dgy * Math.min(1, this.move.t/this.move.dur) : h.gy; }
+
+  _label(ctx, str, cx, y) {
+    ctx.font = '12px "Courier New", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const w = ctx.measureText(str).width + 14;
+    ctx.fillStyle = 'rgba(12,10,24,0.78)';
+    ctx.fillRect(cx - w / 2, y - 9, w, 16);
+    ctx.strokeStyle = 'rgba(255,224,138,0.7)'; ctx.lineWidth = 1;
+    ctx.strokeRect(cx - w / 2, y - 9, w, 16);
+    ctx.fillStyle = '#ffe08a';
+    ctx.fillText(str, cx, y);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  }
 
   _drawHero(ctx, sx, sy) {
     const img = Assets.img('hero');
