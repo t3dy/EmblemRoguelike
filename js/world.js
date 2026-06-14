@@ -193,22 +193,23 @@ export class World {
         const bcol = TILE_COLOR[GROUND_BASE[tt] || tt] || col;
         this._diamond(ctx, sx, sy, bcol[0], bcol[1]);
 
-        // decor sprite on top
+        // decor sprite on top — allow emblem sprites to overflow tile for visibility
         const decoName = TILE_DECOR[tt];
         if (decoName) {
           const img = Assets.img(decoName);
           if (img) {
+            // Increased scales to display emblem engravings at readable size (150px+)
             const DECO_SCALE = {
-              castle: 0.95, town: 0.8, dungeon: 0.7, queencourt: 0.62,
-              mountain: 0.9, peaks: 0.95, forest: 0.7, woods: 0.7,
-              cave: 0.8, cliff: 0.85,
+              castle: 1.8, town: 1.4, dungeon: 1.1, queencourt: 1.5,
+              mountain: 1.2, peaks: 1.3, forest: 0.9, woods: 0.9,
+              cave: 1.1, cliff: 1.2,
             };
-            const scale = DECO_SCALE[tt] || 0.7;
+            const scale = DECO_SCALE[tt] || 0.9;
             const dw = img.width * scale, dh = img.height * scale;
             ctx.drawImage(img, sx - dw / 2, sy + TILE_H / 2 - dh, dw, dh);
             // floating name banner over enterable landmarks (map clarity)
             const LAND_LABEL = { castle: 'Sun-Castle', queencourt: "Queen's Bower", town: 'Town', dungeon: 'The Opus ▼' };
-            if (LAND_LABEL[tt]) this._label(ctx, LAND_LABEL[tt], sx, sy + TILE_H / 2 - dh - 6);
+            if (LAND_LABEL[tt]) this._label(ctx, LAND_LABEL[tt], sx, sy + TILE_H / 2 - dh - 12);
           }
         }
 

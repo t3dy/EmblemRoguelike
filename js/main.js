@@ -11,6 +11,7 @@ import { MessageBox, window9, parchmentCard, text, menu, COLORS, renderFurnacePa
 import { FurnaceOperation } from './alchemical_integration.js';
 import { COURT_ECONOMY, calculateMaterialPrice, isMaterialAvailable, calculateRepairCost, getEconomicDescription } from './court_economy.js';
 import { MATERIALS } from './alchemical_materials.js';
+import { createCastleForCourt } from './castle_interior.js';
 
 const ALL_QUESTS = [...QUESTS, ...EMBLEM_QUESTS];
 const QUEST_BY_ID = Object.fromEntries(ALL_QUESTS.map(q => [q.id, q]));
@@ -52,6 +53,7 @@ class Game {
     this.music = new Music(() => this.audio.ctx());
     this.activeOperation = null;       // A3: Current furnace operation (FurnaceOperation)
     this.activeFurnace = null;         // A3: Reference to the furnace running the operation
+    this.castle = null;                // A3: Castle instance — single source of truth for furnaces/NPCs
     this.activeNPCs = {};              // C1: Track NPCs in active room (npcId -> room)
     this.dangerChoice = null;          // C1: Player choice when danger occurred
     this._bindKeys();
@@ -102,6 +104,8 @@ class Game {
   newGame(classId, attribs) {
     this.hero = newHero(classId, attribs);
     this.world = new World(this);
+    this.castle = createCastleForCourt('prague');
+    this.activeFurnace = this.castle.furnaces.main;
     this.state = 'overworld';
     this.msg.queue = []; this.msg.done = true;
     this.audio.unlock();
@@ -113,6 +117,8 @@ class Game {
     this.hero = s;
     if (this.hero.depth == null) { this.hero.depth = 0; this.hero.maxDepth = 0; }
     this.world = new World(this);
+    this.castle = createCastleForCourt('prague');
+    this.activeFurnace = this.castle.furnaces.main;
     this.state = 'overworld';
     this.audio.unlock();
   }
@@ -556,9 +562,8 @@ class Game {
     let repairCostMsg = '';
     if (this.activeFurnace) {
       furnaceDurability = Math.round(this.activeFurnace.durability || 100);
-      // Import would be circular; calculate inline for now
-      const baseCost = 25 + (100 - furnaceDurability) * 0.5;
-      repairCostMsg = ` (Durability: ${furnaceDurability}%, Repair cost: ${Math.round(baseCost)} gold)`;
+      const repairCost = calculateRepairCost(furnaceDurability, 'prague');
+      repairCostMsg = ` (Durability: ${furnaceDurability}%, Repair cost: ${repairCost} gold)`;
     }
 
     this.choice = {
@@ -642,8 +647,7 @@ class Game {
 
   // C4: Show repair confirmation dialog
   _showRepairConfirm(roomId, currentDurability) {
-    const baseCost = 25 + (100 - currentDurability) * 0.5;
-    const repairCost = Math.round(baseCost);
+    const repairCost = calculateRepairCost(currentDurability, 'prague');
 
     if (this.hero.gold < repairCost) {
       this.msg.push(`You lack the ${repairCost} gold required for repairs.`);
@@ -691,27 +695,19 @@ class Game {
       return false;
     }
 
-    // For now, create a mock Furnace object if we don't have one
-    // In a full implementation, this would come from the castle system
-    if (!this.activeFurnace) {
-      this.activeFurnace = {
-        temperature: 20,
-        targetTemp: targetTemp,
-        fuel: 20,
-        fuelCapacity: 20,
-        durability: 100
-      };
+    // Pick the furnace for this room from the castle; fall back to main
+    if (this.castle) {
+      const roomFurnace = Object.values(this.castle.furnaces).find(f => f.location === roomId);
+      this.activeFurnace = roomFurnace || this.castle.furnaces.main;
     }
+    this.activeFurnace.targetTemp = targetTemp;
 
-    // C1: Get NPCs present in the room (if room is specified)
+    // C1: Get NPCs present in this room from the castle
     const npcsInRoom = [];
-    if (roomId && this.activeNPCs && this.activeNPCs[roomId]) {
-      const npcIds = this.activeNPCs[roomId];
-      if (Array.isArray(npcIds)) {
-        npcsInRoom.push(...npcIds);
-      } else if (typeof npcIds === 'string') {
-        npcsInRoom.push(npcIds);
-      }
+    if (this.castle && roomId) {
+      Object.values(this.castle.NPCs).forEach(npc => {
+        if (npc.location === roomId) npcsInRoom.push(npc.id);
+      });
     }
 
     // Create and start the operation with furnace durability and NPCs
@@ -965,10 +961,14 @@ class Game {
     }
     if (this.state === 'charselect') {
       if (this.charPhase === 'class') {
-        if (k === 'left')  this.classSel = (this.classSel - 1 + CLASSES.length) % CLASSES.length;
-        if (k === 'right') this.classSel = (this.classSel + 1) % CLASSES.length;
-        if (k === 'up')    this.classSel = (this.classSel - 1 + CLASSES.length) % CLASSES.length;
-        if (k === 'down')  this.classSel = (this.classSel + 1) % CLASSES.length;
+        const COLS = 3;
+        const col = this.classSel % COLS, row = Math.floor(this.classSel / COLS);
+        let newCol = col, newRow = row;
+        if (k === 'left')  newCol = (col - 1 + COLS) % COLS;
+        if (k === 'right') newCol = (col + 1) % COLS;
+        if (k === 'up')    newRow = Math.max(0, row - 1);
+        if (k === 'down')  newRow = Math.min(2, row + 1);
+        this.classSel = newRow * COLS + newCol;
         if (k === 'confirm') { this.charPhase = 'attrib'; this.attribSel = 0; }
         if (k === 'cancel') { this.state = 'title'; this.titleSel = 0; }
       } else { // attribute point-buy
@@ -1241,35 +1241,43 @@ class Game {
     if (this.charPhase === 'attrib') { this._renderAttribs(ctx); return; }
     text(ctx, 'CHOOSE THY VESSEL', this.W/2, 30, { align: 'center', size: 26, color: COLORS.hi });
 
-    const n = CLASSES.length, cw = this.W / n;
-    for (let i = 0; i < n; i++) {
-      const c = CLASSES[i], cx = i * cw + cw / 2, sel = i === this.classSel;
-      // portrait card
-      const cardW = cw - 28, cardH = 300, cardX = cx - cardW / 2, cardY = 70;
+    // 3×3 grid layout for 9 classes
+    const COLS = 3, cardW = 200, cardH = 280;
+    const gridW = COLS * cardW + (COLS - 1) * 20;
+    const startX = (this.W - gridW) / 2;
+    const startY = 60;
+
+    for (let i = 0; i < CLASSES.length; i++) {
+      const c = CLASSES[i];
+      const col = i % COLS, row = Math.floor(i / COLS);
+      const cardX = startX + col * (cardW + 20);
+      const cardY = startY + row * (cardH + 20);
+      const sel = i === this.classSel;
+
       parchmentCard(ctx, cardX, cardY, cardW, cardH);
       const img = Assets.img(c.sprite);
       if (img) {
-        const sc = Math.min((cardW - 50) / img.width, (cardH - 60) / img.height);
+        const sc = Math.min((cardW - 40) / img.width, (cardH - 50) / img.height);
         const dw = img.width * sc, dh = img.height * sc;
-        ctx.drawImage(img, cx - dw / 2, cardY + cardH - 26 - dh, dw, dh);
+        ctx.drawImage(img, cardX + cardW / 2 - dw / 2, cardY + cardH - 20 - dh, dw, dh);
       }
       if (sel) {
         ctx.lineWidth = 4; ctx.strokeStyle = COLORS.hi;
         ctx.strokeRect(cardX - 3, cardY - 3, cardW + 6, cardH + 6);
       }
-      text(ctx, c.name, cx, cardY + cardH + 8, { align: 'center', size: 16, color: sel ? COLORS.hi : COLORS.text });
+      text(ctx, c.name, cardX + cardW / 2, cardY + cardH + 8, { align: 'center', size: 14, color: sel ? COLORS.hi : COLORS.text });
     }
 
     // detail panel for the selected class
     const c = CLASSES[this.classSel];
-    const py = 408, pw = this.W - 80;
-    window9(ctx, 40, py, pw, 120);
-    text(ctx, c.name, 60, py + 14, { size: 18, color: COLORS.hi });
-    this._wrap(ctx, c.blurb, 60, py + 40, pw - 40, 16);
-    text(ctx, c.passive, 60, py + 88, { size: 14, color: COLORS.mpBlue });
+    const py = 420, pw = this.W - 80;
+    window9(ctx, 40, py, pw, 100);
+    text(ctx, c.name, 60, py + 12, { size: 16, color: COLORS.hi });
+    this._wrap(ctx, c.blurb, 60, py + 34, pw - 40, 14);
+    text(ctx, c.passive, 60, py + 76, { size: 12, color: COLORS.mpBlue });
 
     if (Math.floor(this.titleT * 1.5) % 2 === 0)
-      text(ctx, '← → choose   •   Z confirm   •   X back', this.W/2, this.H - 26, { align: 'center', size: 13, color: COLORS.textDim });
+      text(ctx, '↑↓← → choose   •   Z confirm   •   X back', this.W/2, this.H - 26, { align: 'center', size: 13, color: COLORS.textDim });
   }
 
   _renderAttribs(ctx) {

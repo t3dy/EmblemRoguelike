@@ -1,6 +1,13 @@
 # Handover — Current State
 
-**Updated:** 2026-06-14 · **Branch:** main · Read `CLAUDE.md` first for run/architecture.
+**Updated:** 2026-06-15 · **Branch:** main · Read `CLAUDE.md` first for run/architecture.
+
+**Session 2026-06-15 work:** 
+- Fixed 3 mislabeled monster sprites (m_wlion, m_lion, m_salamander) via EmblemPrintShop verification
+- Doubled furnace heating rate (0.5→1.0°C/tick) to trigger disasters in normal operations
+- Unified repair-cost logic (removed 2 duplicate implementations, now uses calculateRepairCost with court multipliers)
+- Redesigned character select: 1×9 cramped row → **3×3 grid layout** with 200px cards (3.5× larger) + proper 2D navigation
+- Scaled up world map landmarks: castle 0.95→1.8, town 0.8→1.4, etc. (50-140% increase) so emblem sprites display at 150px+ readable size
 
 ## Where things stand
 
@@ -22,30 +29,35 @@ parse-checks):
 
 ## What's NOT done (prioritized — start here)
 
-1. ~~**Material selection before an operation**~~ **DONE** (2026-06-14). Added `_showMaterialSelection`
-   at main.js:587; hero starts with materials in `hero.materials`; selection UI flows through to
-   `startFurnaceOperation`. Smoke test confirms dangers trigger when materials + temperature align. ✅
+1. ~~**Material selection before an operation**~~ **DONE** (2026-06-14). ✅
 
-2. **Furnace heating speed** *(secondary issue uncovered)*. Operations complete faster than the
-   furnace heats up (3000ms duration, 0.5°C/tick heating = only 30°C rise before completion). Many
-   disasters require temp ≥70°C, so they never trigger in normal play. **Fix:** Either (a) double
-   the heating rate (0.5 → 1.0°C/tick), (b) reduce operation duration, or (c) add low-temp disasters.
-   Smoke test works by starting at 70°C; real game needs furnace boost.
+2. ~~**Furnace heating speed**~~ **DONE** (2026-06-15). Increased heating rate from 0.5°C/tick to 
+   1.0°C/tick (alchemical_integration.js:62), allowing disasters to trigger during normal 3-second
+   operations. Fuel consumption scaled correspondingly (0.01 → 0.02 per tick).
 
-3. **Unify repair-cost logic.** `main.js:558` re-implements inline, ignoring court multipliers.
-   Use `calculateRepairCost` (imported at line 12, court_economy.js).
+3. ~~**Unify repair-cost logic.**~~ **DONE** (2026-06-15). Removed two duplicate inline implementations
+   of repair cost formula at main.js:560 and main.js:645; now using single `calculateRepairCost`
+   function from court_economy.js which properly applies court multipliers.
 
-4. **Single furnace source of truth.** Reconcile the "mock Furnace" in `startFurnaceOperation`
-   with `castle_interior`'s furnace so durability degrades on one object.
+4. ~~**Single furnace source of truth.**~~ **DONE** (2026-06-15). Removed the mock furnace from
+   `startFurnaceOperation`. `newGame`/`continueGame` now create a `Castle('prague')` and set
+   `this.activeFurnace = this.castle.furnaces.main`. Room-specific furnaces are looked up by
+   `location` match; NPCs are pulled from `castle.NPCs` by room. All durability reads/writes go
+   through the same object reference.
 
 5. **Danger choice UI in the real loop.** `resolveDanger`/`getDangerChoice` exist; confirm the
    choice dialog renders when danger fires (verified at class level; not yet canvas-tested).
 
-6. **NPC presence during operations.** `npcsPresent` passed as `[]` from menu path; wire
-   `assignNPCToRoom` so NPCs can be hurt/healed (Track C2).
+6. **NPC presence during operations.** Now wired: `startFurnaceOperation` queries `castle.NPCs`
+   for NPCs whose `location` matches the roomId. Still need to verify damage/heal actually updates
+   NPC health during a danger consequence (Track C2).
 
 7. **Balancing pass.** Tune danger probability, rewards, repair costs, material scarcity.
    See `docs/archive/TRACK_C_INTEGRATION_PLAN.md` for test checklist.
+
+8. ~~**World map graphics integration**~~ **DONE** (2026-06-15). Increased landmark sprite scales
+   (castle 0.95→1.8, town 0.8→1.4, etc.) to display emblem engravings at 150px+ readable size.
+   Sprites overflow isometric tiles naturally, maintaining visual hierarchy and navigability.
 
 ## How to verify your work
 

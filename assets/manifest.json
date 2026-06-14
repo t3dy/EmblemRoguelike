@@ -47,7 +47,7 @@
   {
     "name": "m_wlion",
     "kind": "monster",
-    "label": "Winged Lion",
+    "label": "Hound of the Furnace",
     "file": "assets/sprites/m_wlion.png",
     "w": 260,
     "h": 240,
@@ -74,7 +74,7 @@
   {
     "name": "m_salamander",
     "kind": "monster",
-    "label": "Salamander",
+    "label": "Red Fox Familiar",
     "file": "assets/sprites/m_salamander.png",
     "w": 207,
     "h": 220,
@@ -128,7 +128,7 @@
   {
     "name": "m_lion",
     "kind": "monster",
-    "label": "The Lion",
+    "label": "The Alchemical Hound",
     "file": "assets/sprites/m_lion.png",
     "w": 240,
     "h": 233,

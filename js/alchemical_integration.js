@@ -58,9 +58,9 @@ export class FurnaceOperation {
     // Advance temperature toward target (simplified model)
     const tempDiff = this.targetTemp - this.currentTemp;
     if (tempDiff > 0 && this.fuel > 0) {
-      // Heating: consume fuel
-      this.currentTemp = Math.min(this.currentTemp + 0.5, this.targetTemp);
-      this.fuel = Math.max(0, this.fuel - 0.01);
+      // Heating: consume fuel (1.0°C/tick allows disasters to trigger in normal operations)
+      this.currentTemp = Math.min(this.currentTemp + 1.0, this.targetTemp);
+      this.fuel = Math.max(0, this.fuel - 0.02);
     } else {
       // Cooling: passive natural cooling
       this.currentTemp = Math.max(this.currentTemp - 0.2, 20);
