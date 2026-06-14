@@ -66,6 +66,18 @@ export const MONSTERS = {
   peacock:   { id:'peacock',   name:'Cauda Pavonis',sprite:'m_peacock',   hp:24, atk:13, def:7,  xp:12, gold:16, scale:0.75, spell:null },
   eagle:     { id:'eagle',     name:'Eagle',        sprite:'m_eagle',     hp:24, atk:18, def:6,  xp:14, gold:10, scale:0.75, spell:null },
   horse:     { id:'horse',     name:'Night-Mare',   sprite:'m_horse',     hp:32, atk:17, def:8,  xp:15, gold:12, scale:0.8,  spell:null },
+  // --- research expansion (alchemical bestiary; status/special effects) ---
+  viper:        { id:'viper',        name:'Tyrian Viper',   sprite:'m_serpent',   hp:22, atk:12, def:4,  xp:14, gold:10, scale:0.6,  onHit:'venom' },
+  leaden:       { id:'leaden',       name:'Leaden Man',     sprite:'villager',    hp:30, atk:9,  def:9,  xp:16, gold:8,  scale:0.7,  onHit:'coagulate' },
+  white_eagle:  { id:'white_eagle',  name:'White Eagle',    sprite:'m_eagle',     hp:24, atk:14, def:6,  xp:16, gold:10, scale:0.7,  special:'dodge' },
+  wingless:     { id:'wingless',     name:'Wingless Dragon',sprite:'m_wyrm',      hp:44, atk:14, def:7,  xp:30, gold:18, scale:0.85, special:'regen' },
+  basilisk:     { id:'basilisk',     name:'Basilisk',       sprite:'m_serpent',   hp:46, atk:19, def:7,  xp:48, gold:38, scale:0.78, onHit:'coagulate' },
+  nymph_queen:  { id:'nymph_queen',  name:'Nymph Queen',    sprite:'m_harpy',     hp:50, atk:18, def:9,  xp:44, gold:40, scale:0.85, onHit:'charm' },
+  salamander_lord:{id:'salamander_lord',name:'Salamander Lord',sprite:'m_salamander',hp:60,atk:22,def:9,xp:55,gold:48,scale:0.95, onHit:'blacken', spell:'BURN' },
+  eagle_sublime:{ id:'eagle_sublime',name:'Sublime Eagle',  sprite:'m_eagle',     hp:58, atk:18, def:9,  xp:70, gold:50, scale:0.9,  special:'ramp' },
+  green_lion:   { id:'green_lion',   name:'Green Lion',     sprite:'m_lion',      hp:90, atk:20, def:12, xp:120,gold:90, scale:1.0,  special:'lifesteal' },
+  red_lion:     { id:'red_lion',     name:'Red Lion',       sprite:'m_lion',      hp:130,atk:26, def:14, xp:200,gold:150,scale:1.0,  special:'lifesteal' },
+  rex_marinus:  { id:'rex_marinus',  name:'Rex Marinus',    sprite:'king',        hp:120,atk:22, def:16, xp:160,gold:120,scale:1.0,  onHit:'dissolve' },
   dragon:    { id:'dragon',    name:'The Alchemical Dragon', sprite:'m_dragon', hp:160, atk:36, def:17, xp:240, gold:340, scale:1.0, spell:'BURN', boss:true },
 };
 
@@ -76,13 +88,21 @@ export const WEAPONS = {
   dagger:    { id:'dagger',    name:'Bronze Dagger',  atk:3,  cost:30,  desc:'+3 attack' },
   sword:     { id:'sword',     name:'Iron Sword',     atk:7,  cost:90,  desc:'+7 attack' },
   falchion:  { id:'falchion',  name:'Steel Falchion', atk:12, cost:220, desc:'+12 attack' },
+  geber:     { id:'geber',     name:'Sword of Geber', atk:6,  cost:150, desc:'+6 attack; smoky, unreliable' },
+  scythe:    { id:'scythe',    name:'Scythe of Saturn',atk:9, cost:300, desc:'+9 attack; rots foes (Blacken)', onHit:'blacken' },
+  michael:   { id:'michael',   name:'Lance of Michael',atk:13,cost:420, desc:'+13 attack; smites dragons', vs:'dragon' },
+  sol:       { id:'sol',       name:'Sword of Sol',   atk:15, cost:560, desc:'+15 attack; the red king’s gold' },
   flameblade:{ id:'flameblade',name:'Flaming Sword',  atk:18, cost:500, desc:'+18 attack' },
 };
 export const ARMOR = {
   rags:    { id:'rags',    name:'Linen Robe',    def:0,  cost:0,   desc:'No protection.' },
   leather: { id:'leather', name:'Leather Jerkin',def:4,  cost:40,  desc:'+4 defence' },
   mail:    { id:'mail',    name:'Chain Mail',    def:9,  cost:130, desc:'+9 defence' },
+  whiterobe:{id:'whiterobe',name:'White-Earth Robe',def:6,cost:160, desc:'+6 defence; albedo purity' },
+  salahide:{ id:'salahide',name:'Salamander Hide',def:7,  cost:300, desc:'+7 defence; resists fire' },
+  peacockmantle:{id:'peacockmantle',name:'Peacock Mantle',def:8,cost:340,desc:'+8 defence; all-element resist' },
   plate:   { id:'plate',   name:'Steel Plate',   def:15, cost:320, desc:'+15 defence' },
+  purple:  { id:'purple',  name:'Purple Robe & Crown',def:17,cost:780,desc:'+17 defence; the Red King’s vesture' },
 };
 
 // overworld encounter difficulty by tile type — west is gentle, east is deadly
@@ -93,18 +113,20 @@ export const REGION_SCALE = {
 // region encounter pools keyed by tile type
 export const REGION_POOLS = {
   grass:    ['dove', 'fish', 'toad', 'tortoise'],          // gentle starting country
-  plains:   ['toad', 'serpent', 'tortoise', 'swan'],
-  forest:   ['wolf', 'stag', 'boar', 'peacock'],
-  woods:    ['wolf', 'bear', 'eagle', 'peacock', 'salamander'],
-  cliff:    ['eagle', 'harpy', 'horse', 'stag'],
-  cave:     ['lion', 'wlion', 'salamander', 'ouroboros'],
-  badlands: ['lion', 'wlion', 'horse', 'wyrm', 'ouroboros'],
+  plains:   ['toad', 'serpent', 'tortoise', 'swan', 'leaden', 'viper'],
+  forest:   ['wolf', 'stag', 'boar', 'peacock', 'viper', 'white_eagle'],
+  woods:    ['wolf', 'bear', 'eagle', 'peacock', 'salamander', 'wingless'],
+  cliff:    ['eagle', 'harpy', 'horse', 'stag', 'eagle_sublime', 'basilisk'],
+  cave:     ['lion', 'wlion', 'salamander', 'ouroboros', 'basilisk', 'nymph_queen'],
+  badlands: ['lion', 'wlion', 'horse', 'wyrm', 'ouroboros', 'green_lion', 'red_lion', 'rex_marinus'],
 };
 
 // ---- Spells -----------------------------------------------------------------
 export const SPELLS = {
   HEAL:  { name:'Heal',  cost:4,  type:'heal',   power:30, desc:'Restore ~30 HP', learnLevel:1 },
+  WASH:  { name:'Wash',  cost:3,  type:'cleanse',power:8,  desc:'Cleanse curses + Whiten (heal over time)', learnLevel:2 },
   BLAZE: { name:'Blaze', cost:3,  type:'attack', power:18, desc:'A burst of alchemical fire', learnLevel:3 },
+  PUTREFY:{ name:'Putrefy',cost:5, type:'curse', power:10, desc:'Blacken the foe (rot damage over time)', learnLevel:5 },
   FIRE:  { name:'Fire',  cost:8,  type:'attack', power:42, desc:'Greater fire', learnLevel:7 },
   BURN:  { name:'Burn',  cost:0,  type:'attack', power:16, desc:'enemy fire breath' }, // enemy-only
 };
@@ -112,8 +134,12 @@ export const SPELLS = {
 // ---- Items ------------------------------------------------------------------
 export const ITEMS = {
   herb:    { id:'herb',    name:'Healing Herb', type:'heal', power:25, desc:'Restores ~25 HP' },
+  ardens:  { id:'ardens',  name:'Aqua Ardens',  type:'cure', power:20, desc:'Heals 20 HP & cleanses curses' },
   potion:  { id:'potion',  name:'Aqua Vitae',   type:'mp',   power:12, desc:'Restores 12 MP' },
+  theriac: { id:'theriac', name:'Theriac',      type:'cure', power:10, desc:'Heals 10 & cures poison/curses' },
   elixir:  { id:'elixir',  name:'Red Elixir',   type:'full', power:0,  desc:'Fully restores HP & MP' },
+  quinta:  { id:'quinta',  name:'Quinta Essentia',type:'full',power:0, desc:'Fully restores HP & MP & cleanses all' },
+  aurum:   { id:'aurum',   name:'Aurum Potabile',type:'maxhp',power:10,desc:'+10 max HP, permanently' },
   apple:   { id:'apple',   name:'Golden Apple',  type:'flee', power:0,  desc:'Cast down to flee any battle (even bosses)' },
 };
 
@@ -190,19 +216,19 @@ export const STAGES = [
   { key: 'nigredo',    name: 'NIGREDO',    sub: 'The Blackening',  floors: [1, 3],
     tint: '#2a2630', wall: '#46414f', floor: '#2f2b36',
     motto: '"Putrefaction is the beginning of generation."',
-    pool: ['toad', 'serpent', 'swan', 'wolf', 'bear'] },
+    pool: ['toad', 'serpent', 'swan', 'wolf', 'bear', 'viper', 'leaden'] },
   { key: 'albedo',     name: 'ALBEDO',     sub: 'The Whitening',   floors: [4, 6],
     tint: '#4a4e57', wall: '#9aa0ab', floor: '#6f747e',
     motto: '"Go to the woman who washes the sheets, and do as she does."',
-    pool: ['wolf', 'stag', 'boar', 'harpy', 'salamander'] },
+    pool: ['wolf', 'stag', 'boar', 'harpy', 'salamander', 'white_eagle', 'wingless', 'nymph_queen'] },
   { key: 'citrinitas', name: 'CITRINITAS', sub: 'The Yellowing',   floors: [7, 9],
     tint: '#5a4a22', wall: '#b9912f', floor: '#7d6322',
     motto: '"Nature teaches Nature; Nature conquers Nature."',
-    pool: ['lion', 'wlion', 'harpy', 'salamander', 'boar'] },
+    pool: ['lion', 'wlion', 'harpy', 'salamander', 'boar', 'basilisk', 'eagle_sublime', 'green_lion'] },
   { key: 'rubedo',     name: 'RUBEDO',     sub: 'The Reddening',   floors: [10, 12],
     tint: '#4a1d1d', wall: '#a23a2f', floor: '#5a2420',
     motto: '"Make a circle of man and woman... and thou shalt have the Stone."',
-    pool: ['lion', 'wlion', 'wyrm', 'ouroboros'] },
+    pool: ['lion', 'wlion', 'wyrm', 'ouroboros', 'red_lion', 'salamander_lord', 'rex_marinus'] },
 ];
 export const FINAL_FLOOR = 12;     // the Dragon waits here; beyond it lies the Lapis
 
