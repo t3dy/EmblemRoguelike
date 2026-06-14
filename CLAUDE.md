@@ -17,6 +17,7 @@
   (async () => {
     const ai = await import('./js/alchemical_integration.js');
     const op = new ai.FurnaceOperation('calcination',[{id:'sulfur',qty:2}],100,35,[]);
+    op.currentTemp = 70;  // C1: Start heated so disasters are available (furnace heating is slow)
     for (let i=0;i<400 && op.status==='running' && !op.triggered_danger;i++) op.tick(50);
     return { progress: op.progress, status: op.status, danger: op.triggered_danger?.name };
   })()
@@ -64,10 +65,10 @@ Visit Laboratory → `_showLabMenu()` → `_showFurnaceMenu()` → `startFurnace
 
 ## Known seams (verified 2026-06-14 — the next work, not bugs-in-flight)
 
-1. **Dangers are dormant in normal play.** `_showFurnaceMenu` (`main.js:571`) calls
-   `startFurnaceOperation(op, 80, [])` with **empty materials**. The disaster system keys off
-   hazardous materials, so it only fires when materials are supplied. **Next:** add a
-   material-selection step before an operation starts.
+1. ~~**Dangers are dormant in normal play.**~~ **FIXED** (2026-06-14). Added `_showMaterialSelection` at
+   `main.js:587`; hero starts with `materials: { charcoal: 3, vitriol: 2, sulfur: 2 }`. Material selection
+   flows through to `startFurnaceOperation`. **Secondary issue:** furnace heating is slow (0.5°C/tick),
+   so many disasters (requiring temp ≥70°C) don't trigger in the 3000ms operation window. See HANDOVER.
 2. **Repair cost computed three ways.** `main.js:558` re-implements the formula inline ("circular
    import" comment) and ignores court multipliers, while `court_economy.calculateRepairCost` (already
    imported at `main.js:12`) and `castle_interior.js` both do it court-aware. Unify on the imported fn.
